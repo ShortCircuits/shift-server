@@ -4,9 +4,9 @@
 
   -> git clone masterURL yourdirectory
 
-2. Create a new feature branch from master, If it's a new feature, name the branch "feat#". If it's a bug fix, name the branch "bug#". # should be the associated issue number on the GitHub repo.
+2. Create a new feature branch from master, If it's a new feature, name the branch "featureDescription". If it's a bug fix, name the branch "bugFixDescription".
 
-  -> git checkout -b feat3  OR  -> git checkout -b bug11
+  -> git checkout -b featureDescription  OR  -> git checkout -b bugFixDescription
 
 3. Make changes and stage them for a commit to your feature branch.
 
@@ -16,26 +16,35 @@
 
   -> git commit -m 'message'
 
-5. Sync up with latest master before pushing to remote feature branch:
+5. Ensure your remote master is up to date:
+
+  -> git checkout master
+  -> git pull
+
+6. Go back to your feature branch:
+
+  -> git checkout branchname
+
+7. Sync up with latest master before pushing to remote feature branch:
 
   -> git pull --rebase origin master
 
-6. Fix any merge conflicts if necessary.
+8. Fix any merge conflicts if necessary.
 
-7. Push changes to remote feature branch:
+9. Push changes to remote feature branch:
 
-  -> git push origin feat3
+  -> git push origin branchname
 
-8. Generate pull request:
+10. Generate pull request on GitHub:
 
-  -> base: master
-  -> compare: feat3
+  ensure base: master
+  ensure compare: branchname
 
-9. Fix any issues highlighted by reviewer if necessary.
+11. Fix any issues highlighted by reviewer if necessary.
 
-10. When everything checks out, reviewer merges pull request to master.
+12. When everything checks out, reviewer merges pull request to master.
 
-11. When a pull request is merged and closed, delete feat3 branch.
+13. When a pull request is merged and closed, delete branchname branch.
 
 
 
@@ -44,13 +53,10 @@
 ### Cut a namespaced feature branch from master
 
 Your branch should follow this naming convention:
-  - bug#
-  - feat#
-  - test#
-  - doc#
-  - refactor#
-
-  Where # associates directly with the issue number in the GitHub repo
+  - bugFixDescription
+  - featureDescription
+  - docDescription
+  - refactorDescription
 
 These commands will help you do this:
 
