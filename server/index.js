@@ -1,11 +1,16 @@
 var express = require('express');
 var Path = require('path');
+var request = require('request');
 var routes = express.Router();
 var bodyParser = require('body-parser');
 var db = require('./model/db');
 var Users = require('./model/users');
 
-console.log('hi');
+if(!process.env.API){
+  var api = require( './api' ).api;
+} else {
+  var api = process.env.API;
+}
 //
 //route to your index.html
 //
@@ -19,7 +24,25 @@ routes.get('/api/tags-example', function(req, res) {
   res.send(['node', 'express', 'angular'])
 });
 
+routes.get('/shifts/lat/:lat/lng/:lng/rad/:rad', function(req, res) {
+  //  data comes in get request shifts/lat/30.27809839999999/long/-97.74443280000003/rad/500
+  request('https://maps.googleapis.com/maps/api/place/nearbysearch/json?location='
+    + req.params.lat + ',' + req.params.lng + '&radius=' + req.params.rad +'&name=starbucks&key=' + api,
+    function(err, resp, body) {
+      if(!err && resp.statusCode === 200) {
+        res.setHeader('Content-Type', "application/json");
+        res.send(body);
+      }
+    });
+});
+
+routes.post();
+
 if(process.env.NODE_ENV !== 'test') {
+
+  // The get shift route returns an object of all google place objects with
+  // relevant data from the shift database
+
   //
   // The Catch-all Route
   // This is for supporting browser history pushstate.
