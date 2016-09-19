@@ -19,6 +19,15 @@ if(!process.env.API){
 var assetFolder = Path.resolve(__dirname, '../client/');
 routes.use(express.static(assetFolder));
 
+// Add cors for local testing
+// CORS middleware
+var allowCrossDomain = function(req, res, next) {
+    res.header('Access-Control-Allow-Origin', '*');
+    res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
+    res.header('Access-Control-Allow-Headers', 'Content-Type');
+    next();
+}
+
 //
 // Example endpoint (also tested in test/server/index_test.js)
 //
@@ -72,7 +81,7 @@ if(process.env.NODE_ENV !== 'test') {
 
   // Parse incoming request bodies as JSON
   app.use( require('body-parser').json() );
-
+  app.use(allowCrossDomain);
   // Mount our main router
   app.use('/', routes);
 
