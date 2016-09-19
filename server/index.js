@@ -39,16 +39,25 @@ routes.get('/shifts/lat/:lat/lng/:lng/rad/:rad', function(req, res) {
 });
 
 routes.post('/shifts', function(req, res){
-  console.log(req.body);
   var NewShift = new Shifts(req.body);
   NewShift.save(function(err, post){
     if (err){
       console.error('Error in the shifts post');
       res.status(500).send({error: err.message})
     }
-    res.send(post);
+    res.status(201).send(post);
   })
 })
+
+routes.delete('/shifts', function(req, res) {
+  console.log("this is the delete body: ", req.body);
+  Shifts.remove(req.body, function(err){
+    if(err) {
+      console.error(err.message)
+    }
+    res.status(204).end();
+  })
+});
 
 if(process.env.NODE_ENV !== 'test') {
 
