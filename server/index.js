@@ -5,6 +5,8 @@ var routes = express.Router();
 var bodyParser = require('body-parser');
 var db = require('./model/db');
 var Users = require('./model/users');
+var Shifts = require('./model/shifts');
+var Chats = require('./model/chats');
 
 if(!process.env.API){
   var api = require( './api' ).api;
@@ -36,7 +38,17 @@ routes.get('/shifts/lat/:lat/lng/:lng/rad/:rad', function(req, res) {
     });
 });
 
-routes.post();
+routes.post('/shifts', function(req, res){
+  console.log(req.body);
+  var NewShift = new Shifts(req.body);
+  NewShift.save(function(err, post){
+    if (err){
+      console.error('Error in the shifts post');
+      res.status(500).send({error: err.message})
+    }
+    res.send(post);
+  })
+})
 
 if(process.env.NODE_ENV !== 'test') {
 
