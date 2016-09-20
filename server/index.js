@@ -51,6 +51,17 @@ routes.post('/shifts', function(req, res){
   })
 })
 
+routes.patch('/shifts', function(req, res){
+  // { _id: afhaksjfhksaj, changed: { prize : 25.00, shift_end : "Sat Sep 24 2016 22:00:00 GMT-0500 (CDT)" } }
+  Shifts.findOneAndUpdate({_id: req.body._id}, {$set: req.body.changed}, {new: true}, function(err, shift) {
+    if (err) {
+      console.error(err.message);
+      res.status(404).send({error: err.message})
+    }
+    res.status(200).send(shift);
+  })
+})
+
 routes.delete('/shifts', function(req, res) {
   console.log("this is the delete body: ", req.body);
   Shifts.remove(req.body, function(err){
