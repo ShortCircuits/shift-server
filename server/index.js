@@ -37,14 +37,17 @@ routes.get('/api/tags-example', function(req, res) {
 });
 
 routes.get('/shifts/lat/:lat/lng/:lng/rad/:rad', function(req, res) {
-  //  data comes in get request shifts/lat/30.27809839999999/long/-97.74443280000003/rad/500
+  //  data comes in get request shifts/lat/30.27809839999999/lng/-97.74443280000003/rad/500
   request('https://maps.googleapis.com/maps/api/place/nearbysearch/json?location='
     + req.params.lat + ',' + req.params.lng + '&radius=' + req.params.rad +'&name=starbucks&key=' + api,
     function(err, resp, body) {
+      var theBody = JSON.parse(body);
+      // console.log(TheBody.status);
+      if(err){
+        res.status(resp.statusCode).send(err.message);
+      }
       if(!err && resp.statusCode === 200) {
         helpers.addShiftsToGoogleResponse(req, res, body);
-        // res.setHeader('Content-Type', "application/json");
-        // res.send(body);
       }
     });
 });
@@ -65,7 +68,7 @@ routes.patch('/shifts', function(req, res){
   Shifts.findOneAndUpdate({_id: req.body._id}, {$set: req.body.changed}, {new: true}, function(err, shift) {
     if (err) {
       console.error(err.message);
-      res.status(404).send({error: err.message})
+      res.status(404).send({error: err.message});
     }
     res.status(200).send(shift);
   })
@@ -75,7 +78,8 @@ routes.delete('/shifts', function(req, res) {
   console.log("this is the delete body: ", req.body);
   Shifts.remove(req.body, function(err){
     if(err) {
-      console.error(err.message)
+      console.error(err.message);
+      res.status(500).send({error: err.message});
     }
     res.status(204).end();
   })
