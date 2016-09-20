@@ -26,7 +26,7 @@ module.exports = {
           }
         }
       }
-      //console.log("the appended google Object is: ", googleObj)
+      //console.log("the appended google Object is the following: ", googleObj)
       // return the google Obj with its' appended data
       res.status(200).send(googleObj);
     }) // end of the Shifts.find.
