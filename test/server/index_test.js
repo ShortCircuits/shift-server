@@ -6,7 +6,7 @@ describe("The Server", function() {
    storeId      : "ChIJPXmIAnW1RIYRRwVbIcKT_Cw",
    shift_start  : "Sat Sep 24 2016 17:00:00 GMT-0500 (CDT)",
    shift_end    : "Sat Sep 24 2016 21:00:00 GMT-0500 (CDT)",
-   prize        : 10.00,
+   prize        : "$10.00",
    submitted_by : 1234,
    covered      : false
   }
@@ -44,8 +44,30 @@ describe("The Server", function() {
       .expect(201)
       .expect(function(response) {
         shift = response.body
-        console.log("the shift var: ", shift);
         expect(response.body.storeId).to.include(shift.storeId)
+      })
+  })
+
+  it("should update a shift object", function() {
+   // { _id: afhaksjfhksaj, changed: { prize : 25.00 } }
+    var shiftUpdate = { _id : shift["_id"], changed : { prize : "$25.00" } }
+    return request(app)
+      .patch('/shifts')
+      .send(shiftUpdate)
+      .expect(200)
+      .expect(function(response) {
+        expect(response.body.prize).to.include("$25.00")
+      })
+  })
+
+  it("should error if shift is not found", function() {
+    var shiftUpdate = { _id : "2123ff33", changed : { prize : "$25.00" } }
+    return request(app)
+      .patch('/shifts')
+      .send(shiftUpdate)
+      .expect(404)
+      .expect(function(response) {
+        expect(response.body.error).to.exist
       })
   })
 
