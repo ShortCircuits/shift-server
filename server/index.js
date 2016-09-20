@@ -135,6 +135,7 @@ if(process.env.NODE_ENV !== 'test') {
   // Parse incoming request bodies as JSON
   app.use( require('body-parser').json() );
   app.use(allowCrossDomain);
+<<<<<<< b76b113560e075c28ae5d1ab397d6cb4a7227670
 
   // Token deserialization
   // Check for token existence and extract the user payload
@@ -148,6 +149,8 @@ if(process.env.NODE_ENV !== 'test') {
     };
     next();
   });
+=======
+>>>>>>> deployment
 
   // Mount our main router
   app.use('/', routes);
