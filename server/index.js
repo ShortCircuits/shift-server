@@ -7,13 +7,14 @@ var db = require('./model/db');
 var Users = require('./model/users');
 var Shifts = require('./model/shifts');
 var Chats = require('./model/chats');
+var helpers = require('./config/helpers');
 
 if(!process.env.API){
   var api = require( './api' ).api;
 } else {
   var api = process.env.API;
 }
-//
+
 //route to your index.html
 //
 var assetFolder = Path.resolve(__dirname, '../client/');
@@ -41,23 +42,44 @@ routes.get('/shifts/lat/:lat/lng/:lng/rad/:rad', function(req, res) {
     + req.params.lat + ',' + req.params.lng + '&radius=' + req.params.rad +'&name=starbucks&key=' + api,
     function(err, resp, body) {
       if(!err && resp.statusCode === 200) {
-        res.setHeader('Content-Type', "application/json");
-        res.send(body);
+        helpers.addShiftsToGoogleResponse(req, res, body);
+        // res.setHeader('Content-Type', "application/json");
+        // res.send(body);
       }
     });
 });
 
 routes.post('/shifts', function(req, res){
-  console.log(req.body);
   var NewShift = new Shifts(req.body);
   NewShift.save(function(err, post){
     if (err){
       console.error('Error in the shifts post');
       res.status(500).send({error: err.message})
     }
-    res.send(post);
+    res.status(201).send(post);
   })
 })
+
+routes.patch('/shifts', function(req, res){
+  // { _id: afhaksjfhksaj, changed: { prize : 25.00, shift_end : "Sat Sep 24 2016 22:00:00 GMT-0500 (CDT)" } }
+  Shifts.findOneAndUpdate({_id: req.body._id}, {$set: req.body.changed}, {new: true}, function(err, shift) {
+    if (err) {
+      console.error(err.message);
+      res.status(404).send({error: err.message})
+    }
+    res.status(200).send(shift);
+  })
+})
+
+routes.delete('/shifts', function(req, res) {
+  console.log("this is the delete body: ", req.body);
+  Shifts.remove(req.body, function(err){
+    if(err) {
+      console.error(err.message)
+    }
+    res.status(204).end();
+  })
+});
 
 if(process.env.NODE_ENV !== 'test') {
 
