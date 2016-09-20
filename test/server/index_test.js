@@ -36,7 +36,8 @@ describe("The Server", function() {
       })
   })
 
-  it("should be able to post to shifts enpoint", function() {
+
+  it("should be able to post to shifts endpoint", function() {
     return request(app)
       .post('/shifts')
       .send(shift)
@@ -48,6 +49,15 @@ describe("The Server", function() {
       })
   })
 
+  it("should append a shift object to store data, if store has available shifts", function(){
+    return request(app)
+      .get('/shifts/lat/30.27809/lng/-97.7444/rad/700')
+      .expect(200)
+      .expect(function(response) {
+        expect(response.body.results[0].shifts[0]).to.exist;
+      })
+  })
+
   it("should remove shift from the database", function() {
 
     return request(app)
@@ -55,5 +65,6 @@ describe("The Server", function() {
       .send({_id : shift["_id"]})
       .expect(204)
   })
+
 
 })

@@ -7,13 +7,14 @@ var db = require('./model/db');
 var Users = require('./model/users');
 var Shifts = require('./model/shifts');
 var Chats = require('./model/chats');
+var helpers = require('./config/helpers');
 
 if(!process.env.API){
   var api = require( './api' ).api;
 } else {
   var api = process.env.API;
 }
-//
+
 //route to your index.html
 //
 var assetFolder = Path.resolve(__dirname, '../client/');
@@ -32,8 +33,9 @@ routes.get('/shifts/lat/:lat/lng/:lng/rad/:rad', function(req, res) {
     + req.params.lat + ',' + req.params.lng + '&radius=' + req.params.rad +'&name=starbucks&key=' + api,
     function(err, resp, body) {
       if(!err && resp.statusCode === 200) {
-        res.setHeader('Content-Type', "application/json");
-        res.send(body);
+        helpers.addShiftsToGoogleResponse(req, res, body);
+        // res.setHeader('Content-Type', "application/json");
+        // res.send(body);
       }
     });
 });
