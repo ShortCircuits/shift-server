@@ -16,7 +16,6 @@ describe("The Server", function() {
   app.testReady()
 
   it("serves an example endpoint", function() {
-
     // Mocha will wait for returned promises to complete
     return request(app)
       .get('/api/tags-example')
@@ -27,7 +26,6 @@ describe("The Server", function() {
   })
 
   it("should have an endpoint named shifts that returns the Google object for a Starbucks location", function() {
-
     return request(app)
       .get('/shifts/lat/30.27809/lng/-97.7444/rad/500')
       .expect(200)
@@ -36,6 +34,23 @@ describe("The Server", function() {
       })
   })
 
+  it("should notify if there are no stores in search radius", function(){
+    return request(app)
+      .get('/shifts/lat/89.27809/lng/-97.7444/rad/500')
+      .expect(200)
+      .expect(function(response) {
+        expect(response.body.status).to.include("ZERO_RESULTS")
+      })
+  })
+
+  it("should notify if the coordinates are invalid", function(){
+    return request(app)
+      .get('/shifts/lat/99.27809/lng/-97.7444/rad/500')
+      .expect(200)
+      .expect(function(response) {
+        expect(response.body.status).to.include("INVALID_REQUEST")
+      })
+  })
 
   it("should be able to post to shifts endpoint", function() {
     return request(app)
@@ -46,6 +61,13 @@ describe("The Server", function() {
         shift = response.body
         expect(response.body.storeId).to.include(shift.storeId)
       })
+  })
+
+  it("should error if database is down on posting shifts(this is just invoking the error)", function() {
+    return request(app)
+      .post('/shifts')
+      .send({_id : "hfoiahfoieahfoiehf"})
+      .expect(500)
   })
 
   it("should update a shift object", function() {
@@ -71,6 +93,15 @@ describe("The Server", function() {
       })
   })
 
+  it("should not append a shift object to store data, if store has no available shifts", function(){
+    return request(app)
+      .get('/shifts/lat/30.27809/lng/-97.7444/rad/700')
+      .expect(200)
+      .expect(function(response) {
+        expect(response.body.results[1].shifts).to.be.undefined;
+      })
+  })
+
   it("should append a shift object to store data, if store has available shifts", function(){
     return request(app)
       .get('/shifts/lat/30.27809/lng/-97.7444/rad/700')
@@ -81,12 +112,17 @@ describe("The Server", function() {
   })
 
   it("should remove shift from the database", function() {
-
     return request(app)
       .delete('/shifts')
       .send({_id : shift["_id"]})
       .expect(204)
   })
 
+  it("should error if database is down on deletions(this is just invoking the error)", function() {
+    return request(app)
+      .delete('/shifts')
+      .send({_id : "hfoiahfoieahfoiehf"})
+      .expect(500)
+  })
 
 })
