@@ -7,6 +7,12 @@ var request = require('request');
 var jwt = require('jsonwebtoken');
 var User = require('../model/users');
 
+if (!process.env.FB_SECRET) {
+  var FB_SECRET = require('../fb').FB_SECRET;
+} else {
+  var FB_SECRET = process.env.FB_SECRET;
+}
+
 module.exports = {
    facebookAuthentication: facebookAuthentication,
    createOrRetrieveUser: createOrRetrieveUser
@@ -28,7 +34,7 @@ function facebookAuthentication(options, cb) {
        code: options.code,
        client_id: options.clientId,
        redirect_uri: options.redirectUri,
-       client_secret: process.env.FACEBOOK_SECRET
+       client_secret: FB_SECRET
    };
 
    // Step 1. Exchange authorization code for access token.
