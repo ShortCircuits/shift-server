@@ -25,12 +25,17 @@ if(!process.env.API){
 var assetFolder = Path.resolve(__dirname, '../client/');
 routes.use(express.static(assetFolder));
 
-//
-// Example endpoint (also tested in test/server/index_test.js)
-//
-routes.get('/api/tags-example', function(req, res) {
-  res.send(['node', 'express', 'angular'])
+//=========================
+// Authorization Endpoints
+//=========================
+
+routes.post('/auth/facebook', authCtrl.facebookAuth, authCtrl.retrieveUser, authCtrl.generateToken, function (req, res) {
+    res.json({ token: req.genertedTokenn });
 });
+
+//=========================
+//    /shift Endpoints
+//=========================
 
 routes.get('/shifts/lat/:lat/lng/:lng/rad/:rad', function(req, res) {
   //  data comes in get request shifts/lat/30.27809839999999/lng/-97.74443280000003/rad/500

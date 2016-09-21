@@ -15,15 +15,9 @@ describe("The Server", function() {
   app.use('/', routes)
   app.testReady()
 
-  it("serves an example endpoint", function() {
-    // Mocha will wait for returned promises to complete
-    return request(app)
-      .get('/api/tags-example')
-      .expect(200)
-      .expect(function(response) {
-        expect(response.body).to.include('node')
-      })
-  })
+//====================================
+//      /shift Endpoint Tests
+//====================================
 
   it("should have an endpoint named shifts that returns the Google object for a Starbucks location", function() {
     return request(app)
@@ -123,6 +117,17 @@ describe("The Server", function() {
       .delete('/shifts')
       .send({_id : "hfoiahfoieahfoiehf"})
       .expect(500)
+  })
+
+//====================================
+//   /auth/facebook Endpoint Tests
+//====================================
+
+  it("should have an endpoint '/auth/facebook' that will reply unauthorized when no user input provided", function() {
+    return request(app)
+      .post('/auth/facebook')
+      .send({})
+      .expect(401)
   })
 
 })
