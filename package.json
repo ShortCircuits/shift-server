@@ -4,12 +4,13 @@
   "main": "server/index.js",
   "description": "A rapid project starter for Node, Express and Angular.",
   "engines": {
-    "node": ">=0.10.0"
+    "node": "4.4.7"
   },
   "dependencies": {
     "bluebird": "^3.4.6",
     "body-parser": "^1.15.2",
     "express": "^4.13.1",
+    "jsonwebtoken": "^7.1.9",
     "mongodb": "^2.2.10",
     "mongoose": "^4.6.0",
     "request": "^2.74.0"
