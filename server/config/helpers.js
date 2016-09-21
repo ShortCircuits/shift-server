@@ -30,5 +30,21 @@ module.exports = {
       // return the google Obj with its' appended data
       res.status(200).send(googleObj);
     }) // end of the Shifts.find.
-  } // end of our helper function
+  }, // end of our helper function
+  isAuthenticated: function(req,res,next){
+    if(req.isAuthenticated){
+      return next();
+    }
+    if(req.xhr){
+      return res.status(401).send({"error": "Unauthorized"});
+    } else {
+      return res.status(401).send({"error": "Unauthorized"});
+    }
+  }
+
 } // end of the module.exports
+
+
+
+
+

@@ -130,4 +130,13 @@ describe("The Server", function() {
       .expect(401)
   })
 
+  it("should return unauthorized when trying to access protected endpoint", function() {
+    return request(app)
+      .get('/protected')
+      .expect(401)
+      .expect(function(response){
+        expect(response.body.error).to.include('Unauthorized')
+      })
+  })
+
 })

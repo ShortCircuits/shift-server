@@ -8,6 +8,7 @@ var Users = require('./model/users');
 var Shifts = require('./model/shifts');
 var Chats = require('./model/chats');
 var helpers = require('./config/helpers');
+var isAuthenticated = require('./config/helpers').isAuthenticated;
 
 var AuthModule = require('./config/AuthModule');
 var TokenService = require('./config/TokenService');
@@ -32,6 +33,11 @@ routes.use(express.static(assetFolder));
 routes.post('/auth/facebook', authCtrl.facebookAuth, authCtrl.retrieveUser, authCtrl.generateToken, function (req, res) {
     res.json({ token: req.genertedTokenn });
 });
+
+routes.get('/protected', isAuthenticated, function(req,res){
+  res.send('Welcome');
+
+})
 
 //=========================
 //    /shift Endpoints
