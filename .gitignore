@@ -6,3 +6,4 @@ test/.DS_Store
 .DS_Store
 server/api.js
 server/fb.js
+server/ts.js
