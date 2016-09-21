@@ -9,6 +9,11 @@ var Shifts = require('./model/shifts');
 var Chats = require('./model/chats');
 var helpers = require('./config/helpers');
 
+var AuthModule = require('./config/AuthModule');
+var TokenService = require('./config/TokenService');
+var authCtrl = require('./controllers/auth.ctrl');
+
+
 if(!process.env.API){
   var api = require( './api' ).api;
 } else {
