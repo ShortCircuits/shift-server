@@ -26,6 +26,12 @@ if(!process.env.API){
 var assetFolder = Path.resolve(__dirname, '../client/');
 routes.use(express.static(assetFolder));
 
+var allowCrossDomain = function(req, res, next) {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
+  res.header('Access-Control-Allow-Headers', 'Content-Type');
+  next();
+}
 //=========================
 // Authorization Endpoints
 //=========================
@@ -114,6 +120,21 @@ if(process.env.NODE_ENV !== 'test') {
 
   // Parse incoming request bodies as JSON
   app.use( require('body-parser').json() );
+  app.use(allowCrossDomain);
+
+  // Token deserialization
+  // Check for token existence and extract the user payload
+  app.use(function (req, res, next) {
+    var token = new TokenService(req.headers);
+
+    req.isAuthenticated = token.isAuthenticated;
+    req.tokenPayload = token.getPayload();
+    req.user = {
+      _id: req.tokenPayload._id
+    };
+
+    next();
+  });
 
   // Mount our main router
   app.use('/', routes);
