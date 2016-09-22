@@ -8,8 +8,8 @@ var usersSchema = new mongoose.Schema({
   profilePicture: String,
   home_store: String,
   rating: Number,
-  profile: {facebook: String},
-  tokens: Array
+  profiles: {facebook: String},
+  token: Array
 }, { timestamps: true });
 
 var Users = module.exports = mongoose.model('Users', usersSchema);

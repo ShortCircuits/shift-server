@@ -32,16 +32,17 @@ module.exports = {
     }) // end of the Shifts.find.
   }, // end of our helper function
 
+    //middleware for checking user authentication and locking down endpoints
   isAuthenticated: function(req,res,next){
-    if(req.isAuthenticated()){
+    if(req.isAuthenticated){
       console.log("isAuthenticated ++++++")
       return next();
     }
     if(req.xhr){
-      console.log("isAuthenticated nonononono")
+      console.log("isAuthenticated fail, req.xhr")
       return res.status(401).send({"error": "Unauthorized"});
     } else {
-      console.log("isAuthenticated nonononono")
+      console.log("isAuthenticated fail, else")
       return res.status(401).send({"error": "Unauthorized"});
     }
   }

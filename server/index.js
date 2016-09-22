@@ -15,7 +15,6 @@ var AuthModule = require('./config/AuthModule');
 var TokenService = require('./config/TokenService');
 var authCtrl = require('./controllers/auth.ctrl');
 
-
 if(!process.env.API){
   var api = require( './api' ).api;
 } else {
@@ -30,7 +29,7 @@ routes.use(express.static(assetFolder));
 var allowCrossDomain = function(req, res, next) {
   res.header('Access-Control-Allow-Origin', '*');
   res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
-  res.header('Access-Control-Allow-Headers', 'Content-Type');
+  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
   next();
 }
 //=========================
@@ -38,7 +37,7 @@ var allowCrossDomain = function(req, res, next) {
 //=========================
 
 routes.post('/auth/facebook', authCtrl.facebookAuth, authCtrl.retrieveUser, authCtrl.generateToken, function (req, res) {
-    res.json({ token: req.genertedTokenn });
+    res.json({ token: req.genertedToken });
 });
 
 routes.get('/protected', isAuthenticated, function(req,res){
@@ -142,12 +141,11 @@ if(process.env.NODE_ENV !== 'test') {
   app.use(function (req, res, next) {
     var token = new TokenService(req.headers);
 
-    req.isAuthenticated = token.isAuthenticated;
+    req.isAuthenticated = token.isAuthenticated();
     req.tokenPayload = token.getPayload();
     req.user = {
       _id: req.tokenPayload._id
     };
-
     next();
   });
 
