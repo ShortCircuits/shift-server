@@ -11,6 +11,12 @@ describe("The Server", function() {
    covered      : false
   }
 
+  var pickup = {
+    user_requested: '222',
+    shift_id: 'ngsfjnglkzsnbzflknbzlnLJKnvfz',
+    shift_owner: '444'
+  }
+
   var app = TestHelper.createApp()
   app.use('/', routes)
   app.testReady()
@@ -43,6 +49,17 @@ describe("The Server", function() {
       .expect(200)
       .expect(function(response) {
         expect(response.body.status).to.include("INVALID_REQUEST")
+      })
+  })
+
+  it("should be able to post to pickup endpoint", function() {
+    return request(app)
+      .post('/pickup')
+      .send(pickup)
+      .expect(201)
+      .expect(function(response) {
+        pickup = response.body
+        expect(response.body.user_requested).to.include(pickup.user_requested)
       })
   })
 
