@@ -31,13 +31,17 @@ module.exports = {
       res.status(200).send(googleObj);
     }) // end of the Shifts.find.
   }, // end of our helper function
+
   isAuthenticated: function(req,res,next){
-    if(req.isAuthenticated){
+    if(req.isAuthenticated()){
+      console.log("isAuthenticated ++++++")
       return next();
     }
     if(req.xhr){
+      console.log("isAuthenticated nonononono")
       return res.status(401).send({"error": "Unauthorized"});
     } else {
+      console.log("isAuthenticated nonononono")
       return res.status(401).send({"error": "Unauthorized"});
     }
   }
