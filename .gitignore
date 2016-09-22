@@ -7,3 +7,4 @@ test/.DS_Store
 server/api.js
 server/fb.js
 server/ts.js
+bower_components/

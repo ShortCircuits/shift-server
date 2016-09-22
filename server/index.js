@@ -9,6 +9,7 @@ var Shifts = require('./model/shifts');
 var Chats = require('./model/chats');
 var helpers = require('./config/helpers');
 var isAuthenticated = require('./config/helpers').isAuthenticated;
+var Pickup = require('./model/pickup')
 
 var AuthModule = require('./config/AuthModule');
 var TokenService = require('./config/TokenService');
@@ -43,6 +44,20 @@ routes.post('/auth/facebook', authCtrl.facebookAuth, authCtrl.retrieveUser, auth
 routes.get('/protected', isAuthenticated, function(req,res){
   res.send('Welcome');
 
+})
+//=========================
+//    /pickup Endpoints
+//=========================
+
+routes.post('/pickup', function(req, res){
+  var NewPickup = new Pickup(req.body);
+  NewPickup.save(function(err, post){
+    if(err){
+      console.log("Error in pickup shift")
+      res.status(500).send({error: err.message})
+    }
+    res.status(201).send(post);
+  })
 })
 
 //=========================
