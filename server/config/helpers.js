@@ -33,14 +33,35 @@ module.exports = {
     }) // end of the Shifts.find.
   }, // end of our helper function
   findPickupShifts: function(req, res){
+    var shifts = [];
     Pickup.find({$or: [{user_requested: req.user._id}, {shift_owner: req.user._id}]}, function(err, items) {
       if(err) {
         console.error("pickupShifts error: ", err.message);
         res.status(500).send({error: err.message});
       } 
+      items.forEach(function(row){
+        if(row.user_requested === req.user._id && row.approved){
+          shifts.push(row)
+        }else if(row.shift_owner === req.user._id && !row.approved){
+          shifts.push(row)
+        }
+      })
+      res.send(shifts);
+    })
+  },
+
+  // TODO => once the user has reviewed the request for his shift to be covered
+  // this endpoint will be triggered => endpoint itself needs to be added
+  shiftAproval: function(){
+    Pickup.find({shift_owner: req.user._id}, function(err, items) {
+      if(err) {
+        console.error("Shift aproval error: ", err.message);
+        res.status(500).send({error: err.message});
+      } 
       res.send(items);
     })
   },
+    
     //middleware for checking user authentication and locking down endpoints
   isAuthenticated: function(req,res,next){
     if(req.isAuthenticated){

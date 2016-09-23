@@ -55,6 +55,7 @@ routes.get('/pickup', function(req, res) {
 routes.post('/pickup', function(req, res){
   var user = req.user._id;
   req.body.user_requested = user;
+  req.body.approved = false;
   var NewPickup = new Pickup(req.body);
   NewPickup.save(function(err, post){
     if(err){
@@ -65,10 +66,22 @@ routes.post('/pickup', function(req, res){
   })
 })
 
+// Aproving shift :: TODO needs testing
 routes.patch('/pickup', function(req, res) {
-
+  Pickup.findOneAndUpdate({shift_id: req.body.shift_id}, {$set: req.body.approved}, {new: true}, function(err, shift) {
+    if (err) {
+      console.error(err.message);
+      res.status(404).send({error: err.message});
+    }
+    res.status(200).send(shift);
+  })
 });
 
+
+// Who am I call
+routes.get('/whoami', function(req, res) {
+  res.status(200).send(req.user._id);
+});
 
 //=========================
 //    /shift Endpoints
