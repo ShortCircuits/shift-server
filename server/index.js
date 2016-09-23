@@ -27,17 +27,10 @@ var assetFolder = Path.resolve(__dirname, '../client/');
 routes.use(express.static(assetFolder));
 
 var allowCrossDomain = function(req, res, next) {
-<<<<<<< c3530cda42dbda67077b180b9d717619651c2c0d
   res.header('Access-Control-Allow-Origin', '*');
   res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
   res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
   next();
-=======
-   res.header('Access-Control-Allow-Origin', '*');
-   res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
-   res.header('Access-Control-Allow-Headers', 'Content-Type');
-   next();
->>>>>>> added cors handeling
 }
 //=========================
 // Authorization Endpoints
