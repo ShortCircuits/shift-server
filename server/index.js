@@ -55,7 +55,13 @@ routes.get('/protected', isAuthenticated, function(req,res){
 //    /pickup Endpoints
 //=========================
 
+routes.get('/pickup', function(req, res) {
+  helpers.findPickupShifts(req, res);
+});
+
 routes.post('/pickup', function(req, res){
+  var user = req.user._id;
+  req.body.user_requested = user;
   var NewPickup = new Pickup(req.body);
   NewPickup.save(function(err, post){
     if(err){
@@ -65,6 +71,11 @@ routes.post('/pickup', function(req, res){
     res.status(201).send(post);
   })
 })
+
+routes.patch('/pickup', function(req, res) {
+
+});
+
 
 //=========================
 //    /shift Endpoints
@@ -87,6 +98,7 @@ routes.get('/shifts/lat/:lat/lng/:lng/rad/:rad', function(req, res) {
 });
 
 routes.post('/shifts', function(req, res){
+  req.body.submitted_by = req.user._id;
   var NewShift = new Shifts(req.body);
   NewShift.save(function(err, post){
     if (err){
