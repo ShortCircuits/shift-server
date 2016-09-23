@@ -48,7 +48,13 @@ routes.get('/protected', isAuthenticated, function(req,res){
 //    /pickup Endpoints
 //=========================
 
+routes.get('/pickup', function(req, res) {
+  helpers.findPickupShifts(req, res);
+});
+
 routes.post('/pickup', function(req, res){
+  var user = req.user._id;
+  req.body.user_requested = user;
   var NewPickup = new Pickup(req.body);
   NewPickup.save(function(err, post){
     if(err){
@@ -58,6 +64,11 @@ routes.post('/pickup', function(req, res){
     res.status(201).send(post);
   })
 })
+
+routes.patch('/pickup', function(req, res) {
+
+});
+
 
 //=========================
 //    /shift Endpoints
@@ -80,6 +91,7 @@ routes.get('/shifts/lat/:lat/lng/:lng/rad/:rad', function(req, res) {
 });
 
 routes.post('/shifts', function(req, res){
+  req.body.submitted_by = req.user._id;
   var NewShift = new Shifts(req.body);
   NewShift.save(function(err, post){
     if (err){
@@ -135,6 +147,7 @@ if(process.env.NODE_ENV !== 'test') {
   // Parse incoming request bodies as JSON
   app.use( require('body-parser').json() );
   app.use(allowCrossDomain);
+<<<<<<< b76b113560e075c28ae5d1ab397d6cb4a7227670
 
   // Token deserialization
   // Check for token existence and extract the user payload
@@ -148,6 +161,8 @@ if(process.env.NODE_ENV !== 'test') {
     };
     next();
   });
+=======
+>>>>>>> deployment
 
   // Mount our main router
   app.use('/', routes);

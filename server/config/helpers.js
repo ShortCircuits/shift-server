@@ -1,4 +1,5 @@
 var Shifts = require('../model/shifts');
+var Pickup = require('../model/pickup');
 
 module.exports = {
   addShiftsToGoogleResponse: function(req, res, googleReturn){
@@ -26,12 +27,20 @@ module.exports = {
           }
         }
       }
-      //console.log("the appended google Object is: ", googleObj)
+      //console.log("the appended google Object is the following: ", googleObj)
       // return the google Obj with its' appended data
       res.status(200).send(googleObj);
     }) // end of the Shifts.find.
   }, // end of our helper function
-
+  findPickupShifts: function(req, res){
+    Pickup.find({$or: [{user_requested: req.user._id}, {shift_owner: req.user._id}]}, function(err, items) {
+      if(err) {
+        console.error("pickupShifts error: ", err.message);
+        res.status(500).send({error: err.message});
+      } 
+      res.send(items);
+    })
+  },
     //middleware for checking user authentication and locking down endpoints
   isAuthenticated: function(req,res,next){
     if(req.isAuthenticated){
