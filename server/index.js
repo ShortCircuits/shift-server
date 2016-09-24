@@ -98,6 +98,9 @@ routes.patch('/pickup', function(req, res) {
   })
 });
 
+//=========================
+//    /user Endpoints
+//=========================
 
 // Who am I call
 routes.get('/whoami', function(req, res) {
@@ -115,6 +118,25 @@ routes.get('/getProfileInfo', function(req,res){
     }
     res.status(200).send(profileInfo);
   });
+
+//use this rout to find a user's database information, takes the id being passed in the body
+//user id gets passed in the parms /user/id/5aee23431243fsdh32230034
+routes.get('/user/id/:id', function(req, res) {
+  var id = req.params.id;
+  Users.findById(id, function(err, user) {
+    if(err) {
+      console.error(err.message);
+      res.status(500).send({error: err.message});
+    }
+    var info = {
+      profilePicture: user.profilePicture,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      email: user.email,
+      profiles: user.profiles
+    }
+    res.send(info);
+  })
 });
 
 //=========================
