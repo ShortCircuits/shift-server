@@ -146,8 +146,9 @@ routes.get('/user/id/:id', function(req, res) {
 
 routes.patch('/users', function(req, res){
   var user = req.user._id;
-  console.log("req.body.changed: ", req.body.changed);
-  Users.findOneAndUpdate({_id: user}, {$set: req.body.changed}, {new: true}, function(err, shift) {
+  console.log("user is: ", user);
+  console.log("req.body: ", req.body);
+  Users.findOneAndUpdate({_id: user}, {$set: req.body}, {new: true}, function(err, shift) {
     if (err) {
       console.error(err.message);
       res.status(404).send({error: err.message});
