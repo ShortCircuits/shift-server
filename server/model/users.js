@@ -6,7 +6,7 @@ var usersSchema = new mongoose.Schema({
   email: {type: String, unique:true},
   phone: String,
   profilePicture: String,
-  home_store: String,
+  home_store: {storeId: String, address: String},
   rating: Number,
   profiles: {facebook: String},
   token: Array
