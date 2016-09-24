@@ -49,22 +49,26 @@ routes.get('/protected', isAuthenticated, function(req,res){
 //=========================
 
 routes.get('/pickup', function(req, res) {
+  console.log("get pickup req body: ", req.body);
   helpers.findPickupShifts(req, res);
 });
 
 //TODO: needs to check if the pickup shift already exists
 routes.post('/pickup', function(req, res){
+  console.log("req.body: ", req.body);
   var user = req.user._id;
   req.body.user_requested = user;
   req.body.approved = false;
-  var NewPickup = new Pickup(req.body);
-  NewPickup.save(function(err, post){
-    if(err){
-      console.log("Error in pickup shift")
-      res.status(500).send({error: err.message})
-    }
-    res.status(201).send(post);
-  })
+  // insert shift owner into restricted field
+  req.body.restricted = req.body.shift_owner;
+    var NewPickup = new Pickup(req.body);
+    NewPickup.save(function(err, post){
+      if(err){
+        console.log("Error in pickup shift")
+        res.status(500).send({error: err.message})
+      }
+      res.status(201).send(post);
+    })
 })
 
 // Aproving shift :: TODO needs testing
