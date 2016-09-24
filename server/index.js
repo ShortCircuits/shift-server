@@ -97,6 +97,19 @@ routes.get('/whoami', function(req, res) {
   res.status(200).send(req.user._id);
 });
 
+routes.get('/getProfileInfo', function(req,res){
+  var user = req.user._id;
+  console.log("=======req.user:", req.user);
+  Users.find({_id: user}, function(err, profileInfo){
+    console.log("========profileInfo:", profileInfo);
+    if (err) {
+      console.error(err.message);
+      res.status(404).send({error: err.message});
+    }
+    res.status(200).send(profileInfo);
+  });
+});
+
 //=========================
 //    /shift Endpoints
 //=========================
