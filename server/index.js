@@ -118,6 +118,7 @@ routes.get('/getProfileInfo', function(req,res){
     }
     res.status(200).send(profileInfo);
   });
+});
 
 //use this rout to find a user's database information, takes the id being passed in the body
 //user id gets passed in the parms /user/id/5aee23431243fsdh32230034
