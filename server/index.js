@@ -28,7 +28,7 @@ routes.use(express.static(assetFolder));
 
 var allowCrossDomain = function(req, res, next) {
   res.header('Access-Control-Allow-Origin', '*');
-  res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
+  res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,PATCH');
   res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
   next();
 }
@@ -76,17 +76,24 @@ routes.patch('/pickup', function(req, res) {
       console.error(err.message);
       res.status(404).send({error: err.message});
     }
-    if(req.body.shift_owner === shifts.shift_owner){
-      Pickup.findOneAndUpdate({shift_id: req.body.shift_id}, { approved: true }, function(err, shift) {
-        if (err) {
-          console.error(err.message);
-          res.status(404).send({error: err.message});
-        }
-        res.status(200).send(shift);
-      })
-    }else{
-      res.status(403).send("sorry you dont have promision to aprove this shift")
-    }
+    
+    // for(var i = 0; i < shifts.length; i ++){
+      console.log("this is shifts: ", shifts)
+      if(req.user._id === shifts.shift_owner){
+        Pickup.findOneAndUpdate({shift_id: req.body.shift_id}, { approved: true }, function(err, shift) {
+          if (err) {
+            console.error(err.message);
+            res.status(404).send({error: err.message});
+          }
+          // you can only send one > needs refactoring
+          res.status(200).send(shift);
+        })
+
+      }else{
+        res.status(403).send("sorry you dont have promision to aprove this shift")
+      }
+
+    // }
 
   })
 });
