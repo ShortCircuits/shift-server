@@ -52,6 +52,7 @@ routes.get('/pickup', function(req, res) {
   helpers.findPickupShifts(req, res);
 });
 
+//TODO: needs to check if the pickup shift already exists
 routes.post('/pickup', function(req, res){
   var user = req.user._id;
   req.body.user_requested = user;
@@ -68,12 +69,25 @@ routes.post('/pickup', function(req, res){
 
 // Aproving shift :: TODO needs testing
 routes.patch('/pickup', function(req, res) {
-  Pickup.findOneAndUpdate({shift_id: req.body.shift_id}, {$set: req.body.approved}, {new: true}, function(err, shift) {
+
+  // TODO :: needs a for each shift scenarios
+  Pickup.find({shift_owner: req.user._id},function(err, shifts){
     if (err) {
       console.error(err.message);
       res.status(404).send({error: err.message});
     }
-    res.status(200).send(shift);
+    if(req.body.shift_owner === shifts.shift_owner){
+      Pickup.findOneAndUpdate({shift_id: req.body.shift_id}, { approved: true }, function(err, shift) {
+        if (err) {
+          console.error(err.message);
+          res.status(404).send({error: err.message});
+        }
+        res.status(200).send(shift);
+      })
+    }else{
+      res.status(403).send("sorry you dont have promision to aprove this shift")
+    }
+
   })
 });
 
