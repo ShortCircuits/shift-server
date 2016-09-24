@@ -77,7 +77,9 @@ routes.patch('/pickup', function(req, res) {
     }
     
       console.log("this is shifts: ", shifts)
-      if(req.user._id === shifts.shift_owner){
+      console.log("this is the shifts.shift_owner: ", shifts[0].shift_owner);
+      console.log("this is the req.user._id: ", req.user._id);
+      if(req.user._id === shifts[0].shift_owner){
         Pickup.findOneAndUpdate({shift_id: req.body.shift_id}, { approved: true }, function(err, shift) {
           if (err) {
             console.error(err.message);
