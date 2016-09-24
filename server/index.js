@@ -102,11 +102,16 @@ routes.patch('/pickup', function(req, res) {
 //    /user Endpoints
 //=========================
 
+//==========================
+//    User/Profile Endpoints
+//==========================
+
 // Who am I call
 routes.get('/whoami', function(req, res) {
   res.status(200).send(req.user._id);
 });
 
+// get Profile info to generate profile page on front end 
 routes.get('/getProfileInfo', function(req,res){
   var user = req.user._id;
   console.log("=======req.user:", req.user);
@@ -139,6 +144,18 @@ routes.get('/user/id/:id', function(req, res) {
     res.send(info);
   })
 });
+
+routes.patch('/users', function(req, res){
+  var user = req.user._id;
+  console.log("req.body.changed: ", req.body.changed);
+  Users.findOneAndUpdate({_id: user}, {$set: req.body.changed}, {new: true}, function(err, shift) {
+    if (err) {
+      console.error(err.message);
+      res.status(404).send({error: err.message});
+    }
+    res.status(200).send(shift);
+  })
+})
 
 //=========================
 //    /shift Endpoints
