@@ -70,14 +70,12 @@ routes.post('/pickup', function(req, res){
 // Aproving shift :: TODO needs testing
 routes.patch('/pickup', function(req, res) {
 
-  // TODO :: needs a for each shift scenarios
-  Pickup.find({shift_owner: req.user._id},function(err, shifts){
+  Pickup.find({shift_id: req.body.shift_id},function(err, shifts){
     if (err) {
       console.error(err.message);
       res.status(404).send({error: err.message});
     }
     
-    // for(var i = 0; i < shifts.length; i ++){
       console.log("this is shifts: ", shifts)
       if(req.user._id === shifts.shift_owner){
         Pickup.findOneAndUpdate({shift_id: req.body.shift_id}, { approved: true }, function(err, shift) {
@@ -93,7 +91,6 @@ routes.patch('/pickup', function(req, res) {
         res.status(403).send("sorry you dont have promision to aprove this shift")
       }
 
-    // }
 
   })
 });
