@@ -70,14 +70,12 @@ routes.post('/pickup', function(req, res){
 // Aproving shift :: TODO needs testing
 routes.patch('/pickup', function(req, res) {
 
-  // TODO :: needs a for each shift scenarios
-  Pickup.find({shift_owner: req.user._id},function(err, shifts){
+  Pickup.find({shift_id: req.body.shift_id},function(err, shifts){
     if (err) {
       console.error(err.message);
       res.status(404).send({error: err.message});
     }
     
-    // for(var i = 0; i < shifts.length; i ++){
       console.log("this is shifts: ", shifts)
       if(req.user._id === shifts.shift_owner){
         Pickup.findOneAndUpdate({shift_id: req.body.shift_id}, { approved: true }, function(err, shift) {
@@ -93,7 +91,6 @@ routes.patch('/pickup', function(req, res) {
         res.status(403).send("sorry you dont have promision to aprove this shift")
       }
 
-    // }
 
   })
 });
@@ -102,11 +99,16 @@ routes.patch('/pickup', function(req, res) {
 //    /user Endpoints
 //=========================
 
+//==========================
+//    User/Profile Endpoints
+//==========================
+
 // Who am I call
 routes.get('/whoami', function(req, res) {
   res.status(200).send(req.user._id);
 });
 
+// get Profile info to generate profile page on front end 
 routes.get('/getProfileInfo', function(req,res){
   var user = req.user._id;
   console.log("=======req.user:", req.user);
@@ -139,6 +141,18 @@ routes.get('/user/id/:id', function(req, res) {
     res.send(info);
   })
 });
+
+routes.patch('/users', function(req, res){
+  var user = req.user._id;
+  console.log("req.body.changed: ", req.body.changed);
+  Users.findOneAndUpdate({_id: user}, {$set: req.body.changed}, {new: true}, function(err, shift) {
+    if (err) {
+      console.error(err.message);
+      res.status(404).send({error: err.message});
+    }
+    res.status(200).send(shift);
+  })
+})
 
 //=========================
 //    /shift Endpoints
