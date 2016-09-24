@@ -90,16 +90,12 @@ routes.patch('/pickup', function(req, res) {
         })
 
       }else{
-        res.status(403).send("sorry you dont have promision to aprove this shift")
+        res.status(403).send("sorry you don't have permission to aprove this shift")
       }
 
 
   })
 });
-
-//=========================
-//    /user Endpoints
-//=========================
 
 //==========================
 //    User/Profile Endpoints
@@ -123,6 +119,10 @@ routes.get('/getProfileInfo', function(req,res){
     res.status(200).send(profileInfo);
   });
 });
+
+//=========================
+//    /user Endpoints
+//=========================
 
 //use this rout to find a user's database information, takes the id being passed in the body
 //user id gets passed in the parms /user/id/5aee23431243fsdh32230034
