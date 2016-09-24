@@ -211,6 +211,15 @@ routes.delete('/shifts', function(req, res) {
   })
 });
 
+routes.get('/myshifts', function(req, res) {
+  Shifts.find({submitted_by: req.user._id}, function(err, shifts){
+    if(err) {
+      res.status(500).send({error:err.message});
+    }
+    res.send(shifts);
+  })
+})
+
 if(process.env.NODE_ENV !== 'test') {
 
   // The get shift route returns an object of all google place objects with
