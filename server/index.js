@@ -237,7 +237,7 @@ routes.get('/areaSearch/address/:address', function(req, res) {
             res.status(resp.statusCode).send(err.message);
           }
           if(!err && resp.statusCode === 200) {
-            helpers.addShiftsToGoogleResponse(req, res, body);
+            helpers.addShiftsToGoogleResponse(req, res, body, lat, lng);
           }
         });
       }
