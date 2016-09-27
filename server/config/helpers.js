@@ -2,11 +2,12 @@ var Shifts = require('../model/shifts');
 var Pickup = require('../model/pickup');
 
 module.exports = {
-  addShiftsToGoogleResponse: function(req, res, googleReturn){
+  addShiftsToGoogleResponse: function(req, res, googleReturn, lat, lng){
     // for some reason we have to parse this in a var before using it...(prob bodyParser issue)
     var googleObj = JSON.parse(googleReturn);
     // the stores list is stored in the results key
     var storesArray = googleObj.results;
+    googleObj.location = {lat: lat, lng: lng};
     // gather all of the store IDs to search our db with
     var storeIds = [];
     for(var i = 0; i < storesArray.length; i++){

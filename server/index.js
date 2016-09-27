@@ -49,27 +49,45 @@ routes.get('/protected', isAuthenticated, function(req,res){
 //=========================
 
 routes.get('/pickup', function(req, res) {
+  console.log("get pickup req body: ", req.body);
   helpers.findPickupShifts(req, res);
 });
 
+
+// test endpoint for getting different pickups/requesters by shift Id
+// routes.get('/pickup/requesters/:shiftid', function(req, res) {
+//   console.log("get pickup req shiftid: ", req.params.shiftid);
+//   Pickup.find( {shift_id: req.params.shiftid}, function(err, shifts){
+//     if(err) {
+//       console.log("Error get pickup/requesters: ", err);
+//       res.status(500).send({error: err.message});
+//     } 
+//     res.send(shifts);
+//   })
+// });
+
 //TODO: needs to check if the pickup shift already exists
 routes.post('/pickup', function(req, res){
+  console.log("req.body: ", req.body);
   var user = req.user._id;
   req.body.user_requested = user;
   req.body.approved = false;
-  var NewPickup = new Pickup(req.body);
-  NewPickup.save(function(err, post){
-    if(err){
-      console.log("Error in pickup shift")
-      res.status(500).send({error: err.message})
-    }
-    res.status(201).send(post);
-  })
+  // insert shift owner into restricted field
+  req.body.restricted = req.body.shift_owner;
+  // find all pickups 
+    var NewPickup = new Pickup(req.body);
+    NewPickup.save(function(err, post){
+      if(err){
+        console.log("Error in pickup shift")
+        res.status(500).send({error: err.message})
+      }
+      res.status(201).send(post);
+    })
 })
 
 // Aproving shift :: TODO needs testing
 routes.patch('/pickup', function(req, res) {
-
+  // console.log("req.body: ", req.body);
   Pickup.find({shift_id: req.body.shift_id},function(err, shifts){
     if (err) {
       console.error(err.message);
@@ -79,6 +97,7 @@ routes.patch('/pickup', function(req, res) {
       console.log("this is shifts: ", shifts)
       console.log("this is the shifts.shift_owner: ", shifts[0].shift_owner);
       console.log("this is the req.user._id: ", req.user._id);
+      // If the user making the approval is the same as the shift owner allow update patch to /pickup
       if(req.user._id === shifts[0].shift_owner){
         Pickup.findOneAndUpdate({shift_id: req.body.shift_id}, { approved: true }, function(err, shift) {
           if (err) {
@@ -91,6 +110,39 @@ routes.patch('/pickup', function(req, res) {
 
       }else{
         res.status(403).send("sorry you don't have permission to aprove this shift")
+      }
+
+
+  })
+})
+
+// endpoint which removes pickups after approver rejects the request
+routes.patch('/pickupreject', function(req, res) {
+  // console.log("req.body: ", req.body);
+  Pickup.find({shift_id: req.body.shift_id},function(err, shifts){
+    if (err) {
+      console.error(err.message);
+      res.status(404).send({error: err.message});
+    }
+      
+      console.log("this is shifts: ", shifts)
+      console.log("this is the requester: ", shifts[0].user_requested)
+      console.log("this is the shifts.shift_owner: ", shifts[0].shift_owner);
+      console.log("this is the req.user._id: ", req.user._id);
+      // If the user making the approval is the same as the shift owner allow update patch to /pickup
+      if(req.user._id === shifts[0].shift_owner){
+        // remove the row where the shiftId and user requested match the rejected requester's
+        Pickup.remove( {$and: [{ shift_id: req.body.shift_id }, { user_requested: shifts[0].user_requested }]}, function(err, shift) {
+          if (err) {
+            console.error(err.message);
+            res.status(404).send({error: err.message});
+          }
+          // you can only send one > needs refactoring
+          res.status(200).send(shift);
+        })
+
+      }else{
+        res.status(403).send("sorry you don't have permission to reject this shift")
       }
 
 
@@ -158,8 +210,45 @@ routes.patch('/users', function(req, res){
 })
 
 //=========================
+//  /areaSearch Endpoints
+//=========================
+
+//start here tomorrow !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!***************************!
+
+routes.get('/areaSearch/address/:address', function(req, res) {
+  console.log("made it to server!")
+  //  data comes in get request shifts/lat/30.27809839999999/lng/-97.74443280000003/rad/500
+  request('https://maps.googleapis.com/maps/api/geocode/json?address=' + req.params.address + '&key=' + api,
+    function(err, resp, body) {
+      var theBody = JSON.parse(body);
+      // console.log(theBody.status);
+      if(err){
+        res.status(resp.statusCode).send(err.message);
+      }
+      if(!err && resp.statusCode === 200) {
+        var lat = theBody.results[0].geometry.location.lat;
+        var lng = theBody.results[0].geometry.location.lng;
+        request('https://maps.googleapis.com/maps/api/place/nearbysearch/json?location='
+        + lat + ',' + lng + '&radius=5000&name=starbucks&key=' + api,
+        function(err, resp, body) {
+          var theBody = JSON.parse(body);
+          // console.log(TheBody.status);
+          if(err){
+            res.status(resp.statusCode).send(err.message);
+          }
+          if(!err && resp.statusCode === 200) {
+            helpers.addShiftsToGoogleResponse(req, res, body, lat, lng);
+          }
+        });
+      }
+    });
+});
+// https://maps.googleapis.com/maps/api/geocode/json?address=zipCode&key=AIzaSyBczNtYGmp_cAzRu0aIUzwJJSTStflsKcs
+
+//=========================
 //    /shift Endpoints
 //=========================
+
 
 routes.get('/shifts/lat/:lat/lng/:lng/rad/:rad', function(req, res) {
   //  data comes in get request shifts/lat/30.27809839999999/lng/-97.74443280000003/rad/500
@@ -211,6 +300,15 @@ routes.delete('/shifts', function(req, res) {
     res.status(204).end();
   })
 });
+
+routes.get('/myshifts', function(req, res) {
+  Shifts.find({submitted_by: req.user._id}, function(err, shifts){
+    if(err) {
+      res.status(500).send({error:err.message});
+    }
+    res.send(shifts);
+  })
+})
 
 if(process.env.NODE_ENV !== 'test') {
 
