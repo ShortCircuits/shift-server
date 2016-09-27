@@ -53,6 +53,19 @@ routes.get('/pickup', function(req, res) {
   helpers.findPickupShifts(req, res);
 });
 
+
+// test endpoint for getting different pickups/requesters by shift Id
+// routes.get('/pickup/requesters/:shiftid', function(req, res) {
+//   console.log("get pickup req shiftid: ", req.params.shiftid);
+//   Pickup.find( {shift_id: req.params.shiftid}, function(err, shifts){
+//     if(err) {
+//       console.log("Error get pickup/requesters: ", err);
+//       res.status(500).send({error: err.message});
+//     } 
+//     res.send(shifts);
+//   })
+// });
+
 //TODO: needs to check if the pickup shift already exists
 routes.post('/pickup', function(req, res){
   console.log("req.body: ", req.body);
@@ -61,6 +74,7 @@ routes.post('/pickup', function(req, res){
   req.body.approved = false;
   // insert shift owner into restricted field
   req.body.restricted = req.body.shift_owner;
+  // find all pickups 
     var NewPickup = new Pickup(req.body);
     NewPickup.save(function(err, post){
       if(err){
@@ -73,7 +87,7 @@ routes.post('/pickup', function(req, res){
 
 // Aproving shift :: TODO needs testing
 routes.patch('/pickup', function(req, res) {
-
+  // console.log("req.body: ", req.body);
   Pickup.find({shift_id: req.body.shift_id},function(err, shifts){
     if (err) {
       console.error(err.message);
@@ -83,6 +97,7 @@ routes.patch('/pickup', function(req, res) {
       console.log("this is shifts: ", shifts)
       console.log("this is the shifts.shift_owner: ", shifts[0].shift_owner);
       console.log("this is the req.user._id: ", req.user._id);
+      // If the user making the approval is the same as the shift owner allow update patch to /pickup
       if(req.user._id === shifts[0].shift_owner){
         Pickup.findOneAndUpdate({shift_id: req.body.shift_id}, { approved: true }, function(err, shift) {
           if (err) {
@@ -95,6 +110,39 @@ routes.patch('/pickup', function(req, res) {
 
       }else{
         res.status(403).send("sorry you don't have permission to aprove this shift")
+      }
+
+
+  })
+})
+
+// endpoint which removes pickups after approver rejects the request
+routes.patch('/pickupreject', function(req, res) {
+  // console.log("req.body: ", req.body);
+  Pickup.find({shift_id: req.body.shift_id},function(err, shifts){
+    if (err) {
+      console.error(err.message);
+      res.status(404).send({error: err.message});
+    }
+      
+      console.log("this is shifts: ", shifts)
+      console.log("this is the requester: ", shifts[0].user_requested)
+      console.log("this is the shifts.shift_owner: ", shifts[0].shift_owner);
+      console.log("this is the req.user._id: ", req.user._id);
+      // If the user making the approval is the same as the shift owner allow update patch to /pickup
+      if(req.user._id === shifts[0].shift_owner){
+        // remove the row where the shiftId and user requested match the rejected requester's
+        Pickup.remove( {$and: [{ shift_id: req.body.shift_id }, { user_requested: shifts[0].user_requested }]}, function(err, shift) {
+          if (err) {
+            console.error(err.message);
+            res.status(404).send({error: err.message});
+          }
+          // you can only send one > needs refactoring
+          res.status(200).send(shift);
+        })
+
+      }else{
+        res.status(403).send("sorry you don't have permission to reject this shift")
       }
 
 
