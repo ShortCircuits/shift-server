@@ -268,7 +268,6 @@ routes.get('/shifts/lat/:lat/lng/:lng/rad/:rad', function(req, res) {
 
 routes.post('/shifts', function(req, res){
   req.body.submitted_by = req.user._id;
-  req.body.submitted_by_name = req.user.firstName + " " + req.user.lastName;
   var NewShift = new Shifts(req.body);
   NewShift.save(function(err, post){
     if (err){
