@@ -6,6 +6,7 @@ var shiftsSchema = new mongoose.Schema({
   shift_end: Date,
   prize: String,
   submitted_by: String,
+  submitted_by_name: String,
   covered_by: Number,
   covered: Boolean
 });

@@ -148,12 +148,12 @@ routes.patch('/users', function(req, res){
   var user = req.user._id;
   console.log("user is: ", user);
   console.log("req.body: ", req.body);
-  Users.findOneAndUpdate({_id: user}, {$set: req.body}, {new: true}, function(err, shift) {
+  Users.findOneAndUpdate({_id: user}, {$set: req.body}, {new: true}, function(err, userData) {
     if (err) {
       console.error(err.message);
       res.status(404).send({error: err.message});
     }
-    res.status(200).send(shift);
+    res.status(200).send(userData);
   })
 })
 
@@ -179,6 +179,7 @@ routes.get('/shifts/lat/:lat/lng/:lng/rad/:rad', function(req, res) {
 
 routes.post('/shifts', function(req, res){
   req.body.submitted_by = req.user._id;
+  req.body.submitted_by_name = req.user.firstName + " " + req.user.lastName;
   var NewShift = new Shifts(req.body);
   NewShift.save(function(err, post){
     if (err){
