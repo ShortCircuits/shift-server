@@ -210,8 +210,45 @@ routes.patch('/users', function(req, res){
 })
 
 //=========================
+//  /areaSearch Endpoints
+//=========================
+
+//start here tomorrow !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!***************************!
+
+routes.get('/areaSearch/address/:address', function(req, res) {
+  console.log("made it to server!")
+  //  data comes in get request shifts/lat/30.27809839999999/lng/-97.74443280000003/rad/500
+  request('https://maps.googleapis.com/maps/api/geocode/json?address=' + req.params.address + '&key=' + api,
+    function(err, resp, body) {
+      var theBody = JSON.parse(body);
+      // console.log(theBody.status);
+      if(err){
+        res.status(resp.statusCode).send(err.message);
+      }
+      if(!err && resp.statusCode === 200) {
+        var lat = theBody.results[0].geometry.location.lat;
+        var lng = theBody.results[0].geometry.location.lng;
+        request('https://maps.googleapis.com/maps/api/place/nearbysearch/json?location='
+        + lat + ',' + lng + '&radius=5000&name=starbucks&key=' + api,
+        function(err, resp, body) {
+          var theBody = JSON.parse(body);
+          // console.log(TheBody.status);
+          if(err){
+            res.status(resp.statusCode).send(err.message);
+          }
+          if(!err && resp.statusCode === 200) {
+            helpers.addShiftsToGoogleResponse(req, res, body);
+          }
+        });
+      }
+    });
+});
+// https://maps.googleapis.com/maps/api/geocode/json?address=zipCode&key=AIzaSyBczNtYGmp_cAzRu0aIUzwJJSTStflsKcs
+
+//=========================
 //    /shift Endpoints
 //=========================
+
 
 routes.get('/shifts/lat/:lat/lng/:lng/rad/:rad', function(req, res) {
   //  data comes in get request shifts/lat/30.27809839999999/lng/-97.74443280000003/rad/500
