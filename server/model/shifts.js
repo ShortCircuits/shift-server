@@ -1,7 +1,7 @@
 var mongoose = require('mongoose');
 
 var shiftsSchema = new mongoose.Schema({
-  storeId: String,
+  home_store: {storeId: String, address: String},
   shift_start: Date,
   shift_end: Date,
   prize: String,
