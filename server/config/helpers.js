@@ -14,12 +14,12 @@ module.exports = {
       storeIds.push(storesArray[i].place_id);
     }
     // do a db find for any stores that match and store IDs from the google call
-    Shifts.find({storeId: {$in: storeIds}}, function(err, items){
+    Shifts.find({home_store.storeId: {$in: storeIds}}, function(err, items){
       var dbStoreMatches = items;
       // if any matches exist, append that store with a shifts object containing all shifts
       for(var i = 0; i < dbStoreMatches.length; i++){
         for(var j = 0; j < googleObj.results.length; j++){
-          if(dbStoreMatches[i].storeId === googleObj.results[j].place_id){
+          if(dbStoreMatches[i].home_store.storeId === googleObj.results[j].place_id){
             if(!googleObj.results[j].shifts){
               googleObj.results[j].shifts = [dbStoreMatches[i]];
             } else {
