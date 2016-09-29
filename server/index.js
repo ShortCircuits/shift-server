@@ -48,7 +48,7 @@ routes.get('/protected', isAuthenticated, function(req,res){
 //    /pickup Endpoints
 //=========================
 
-routes.get('/pickup', function(req, res) {
+routes.get('/pickup', isAuthenticated, function(req, res) {
   console.log("get pickup req body: ", req.body);
   helpers.findPickupShifts(req, res);
 });
@@ -67,7 +67,7 @@ routes.get('/pickup', function(req, res) {
 // });
 
 //TODO: needs to check if the pickup shift already exists
-routes.post('/pickup', function(req, res){
+routes.post('/pickup', isAuthenticated, function(req, res){
   console.log("req.body: ", req.body);
   var user = req.user._id;
   req.body.user_requested = user;
@@ -86,7 +86,7 @@ routes.post('/pickup', function(req, res){
 })
 
 // Aproving shift :: TODO needs testing
-routes.patch('/pickup', function(req, res) {
+routes.patch('/pickup', isAuthenticated, function(req, res) {
   // console.log("req.body: ", req.body);
   Pickup.find({shift_id: req.body.shift_id},function(err, shifts){
     if (err) {
@@ -117,7 +117,7 @@ routes.patch('/pickup', function(req, res) {
 })
 
 // endpoint which removes pickups after approver rejects the request
-routes.patch('/pickupreject', function(req, res) {
+routes.patch('/pickupreject', isAuthenticated, function(req, res) {
   // console.log("req.body: ", req.body);
   Pickup.find({shift_id: req.body.shift_id},function(err, shifts){
     if (err) {
@@ -159,7 +159,7 @@ routes.get('/whoami', function(req, res) {
 });
 
 // get Profile info to generate profile page on front end 
-routes.get('/getProfileInfo', function(req,res){
+routes.get('/getProfileInfo', isAuthenticated, function(req,res){
   var user = req.user._id;
   console.log("=======req.user:", req.user);
   Users.find({_id: user}, function(err, profileInfo){
@@ -178,7 +178,7 @@ routes.get('/getProfileInfo', function(req,res){
 
 //use this rout to find a user's database information, takes the id being passed in the body
 //user id gets passed in the parms /user/id/5aee23431243fsdh32230034
-routes.get('/user/id/:id', function(req, res) {
+routes.get('/user/id/:id', isAuthenticated, function(req, res) {
   var id = req.params.id;
   Users.findById(id, function(err, user) {
     if(err) {
@@ -196,7 +196,7 @@ routes.get('/user/id/:id', function(req, res) {
   })
 });
 
-routes.patch('/users', function(req, res){
+routes.patch('/users', isAuthenticated, function(req, res){
   var user = req.user._id;
   console.log("user is: ", user);
   console.log("req.body: ", req.body);
@@ -215,7 +215,7 @@ routes.patch('/users', function(req, res){
 
 //start here tomorrow !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!***************************!
 
-routes.get('/areaSearch/address/:address', function(req, res) {
+routes.get('/areaSearch/address/:address', isAuthenticated, function(req, res) {
   console.log("made it to server!")
   //  data comes in get request shifts/lat/30.27809839999999/lng/-97.74443280000003/rad/500
   request('https://maps.googleapis.com/maps/api/geocode/json?address=' + req.params.address + '&key=' + api,
@@ -250,7 +250,7 @@ routes.get('/areaSearch/address/:address', function(req, res) {
 //=========================
 
 
-routes.get('/shifts/lat/:lat/lng/:lng/rad/:rad', function(req, res) {
+routes.get('/shifts/lat/:lat/lng/:lng/rad/:rad', isAuthenticated, function(req, res) {
   //  data comes in get request shifts/lat/30.27809839999999/lng/-97.74443280000003/rad/500
   request('https://maps.googleapis.com/maps/api/place/nearbysearch/json?location='
     + req.params.lat + ',' + req.params.lng + '&radius=' + req.params.rad +'&name=starbucks&key=' + api,
@@ -266,7 +266,7 @@ routes.get('/shifts/lat/:lat/lng/:lng/rad/:rad', function(req, res) {
     });
 });
 
-routes.post('/shifts', function(req, res){
+routes.post('/shifts', isAuthenticated, function(req, res){
   req.body.submitted_by = req.user._id;
   var NewShift = new Shifts(req.body);
   NewShift.save(function(err, post){
@@ -278,7 +278,7 @@ routes.post('/shifts', function(req, res){
   })
 })
 
-routes.patch('/shifts', function(req, res){
+routes.patch('/shifts', isAuthenticated, function(req, res){
   // { _id: afhaksjfhksaj, changed: { prize : 25.00, shift_end : "Sat Sep 24 2016 22:00:00 GMT-0500 (CDT)" } }
   Shifts.findOneAndUpdate({_id: req.body._id}, {$set: req.body.changed}, {new: true}, function(err, shift) {
     if (err) {
@@ -289,7 +289,7 @@ routes.patch('/shifts', function(req, res){
   })
 })
 
-routes.delete('/shifts', function(req, res) {
+routes.delete('/shifts', isAuthenticated, function(req, res) {
   console.log("this is the delete body: ", req.body);
   Shifts.remove(req.body, function(err){
     if(err) {
@@ -300,7 +300,7 @@ routes.delete('/shifts', function(req, res) {
   })
 });
 
-routes.get('/myshifts', function(req, res) {
+routes.get('/myshifts', isAuthenticated, function(req, res) {
   Shifts.find({submitted_by: req.user._id}, function(err, shifts){
     if(err) {
       res.status(500).send({error:err.message});
