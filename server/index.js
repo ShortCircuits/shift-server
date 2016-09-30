@@ -195,8 +195,6 @@ routes.get('/user/id/:id', isAuthenticated, function(req, res) {
       }
       res.send(info);
     }
-
-    res.send("User not found.");
     
   })
 });
