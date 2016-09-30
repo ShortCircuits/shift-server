@@ -8,4 +8,6 @@ var pickupSchema = new mongoose.Schema({
   restricted: Array
 });
 
+pickupSchema.index({ user_requested: 1, shift_id: 1}, { unique: true })
+
 var Pickup = module.exports = mongoose.model('Pickup', pickupSchema);
