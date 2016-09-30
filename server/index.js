@@ -185,14 +185,19 @@ routes.get('/user/id/:id', isAuthenticated, function(req, res) {
       console.error(err.message);
       res.status(500).send({error: err.message});
     }
-    var info = {
-      profilePicture: user.profilePicture,
-      firstName: user.firstName,
-      lastName: user.lastName,
-      email: user.email,
-      profiles: user.profiles
+    if (user.profilePicture){
+      var info = {
+        profilePicture: user.profilePicture,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        email: user.email,
+        profiles: user.profiles
+      }
+      res.send(info);
     }
-    res.send(info);
+
+    res.send("User not found.");
+    
   })
 });
 
