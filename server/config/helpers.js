@@ -16,6 +16,10 @@ module.exports = {
     // do a db find for any stores that match and store IDs from the google call
     Shifts.find({'home_store.storeId': {$in: storeIds}}, function(err, items){
       var dbStoreMatches = items;
+      var rightNow = new Date();
+      dbStoreMatches = dbStoreMatches.filter(function(obj){
+        return obj.shift_end > rightNow;
+      });
       // if any matches exist, append that store with a shifts object containing all shifts
       for(var i = 0; i < dbStoreMatches.length; i++){
         for(var j = 0; j < googleObj.results.length; j++){
