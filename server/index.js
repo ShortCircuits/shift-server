@@ -217,54 +217,55 @@ routes.patch('/rateuser', isAuthenticated, function(req, res){
   var reps;
 
   // needs: req.body.rep, req.body.shift_id
-
+  console.log("this is user request body ", req.body)
   Pickup.find({'_id': req.body.pickup_shift_id},function(err, shifts){
     if (err) {
       console.error(err.message);
       res.status(404).send({error: err.message});
     }
-    
-    Shifts.find({'_id': shifts[0].shift_id}, function(err, shift){
-      if (err) {
-        console.error(err.message);
-        res.status(404).send({error: err.message});
-      }
-      
-      // check to see if the shift has ended before leting users vote on reps.
-      var shiftTime = shift[0].shift_end;
-      var currTime = new Date();
-      if(currTime > shiftTime){
-        // check to see if the person adding reps is the owner of the shift;
-        if(shifts[0].shift_owner === req.user._id){  
-          console.log("this is shifts", shifts)
-          var requester = shifts[0].user_requested;
-          // if positive set var to pos and vice versa
-          if(req.body.rep){
-            if(req.body.rep === 'positive'){
-              reps = 'rating.positive';
-            }else if(req.body.rep === 'negative'){
-              reps = 'rating.negative';
-            }else{
-              res.status(301).send("wrong reputation attribute")
-            }
-          }
-
-          var action = {};
-          action[reps] = 1; 
-
-          // if user requested is part of the pickup shift then procede with updating his reps;
-          Users.findOneAndUpdate({'_id': requester}, {$inc: action},function(err, items){
-            if (err) {
-              console.error(err.message);
-              res.status(404).send({error: err.message});
-            }
-            res.status(201).send("Successfuly added a rep");
-          })
+    console.log("this is pickup shift id passed in from vote user ", req.body.pickup_shift_id)
+    console.log("this is the shift from pickup", shifts)
+    if(shifts[0]){
+      Shifts.find({'_id': shifts[0].shift_id}, function(err, shift){
+        if (err) {
+          console.error(err.message);
+          res.status(404).send({error: err.message});
         }
-      }
-    })
+        
+        // check to see if the shift has ended before leting users vote on reps.
+        var shiftTime = shift[0].shift_end;
+        var currTime = new Date();
+        if(currTime > shiftTime){
+          // check to see if the person adding reps is the owner of the shift;
+          if(shifts[0].shift_owner === req.user._id){  
+            console.log("this is shifts", shifts)
+            var requester = shifts[0].user_requested;
+            // if positive set var to pos and vice versa
+            if(req.body.rep){
+              if(req.body.rep === 'positive'){
+                reps = 'rating.positive';
+              }else if(req.body.rep === 'negative'){
+                reps = 'rating.negative';
+              }
+            }
+
+            var action = {};
+            action[reps] = 1; 
+
+            // if user requested is part of the pickup shift then procede with updating his reps;
+            Users.findOneAndUpdate({'_id': requester}, {$inc: action},function(err, items){
+              if (err) {
+                console.error(err.message);
+                res.status(404).send({error: err.message});
+              }
+              res.status(201).send("Successfuly added a rep");
+            })
+          }
+        }
+      })
+    }
   })
-  res.status(500).send("could not submit the rating");
+  res.send("could not submit the rating");
 })
 
 //=========================
