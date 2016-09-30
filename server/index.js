@@ -217,15 +217,15 @@ routes.patch('/rateuser', isAuthenticated, function(req, res){
   var reps;
 
   // needs: req.body.rep, req.body.shift_id
-
-  Pickup.find({'_id': req.body.pickup_shift_id},function(err, shifts){
+  Shifts.find({'_id': req.body.pickup_shift_id}, function(err, shift){
+  
     if (err) {
       console.error(err.message);
       res.status(404).send({error: err.message});
     }
     console.log("this is pickup shift id passed in from vote user ", req.body.pickup_shift_id)
     if(shifts[0]){
-      Shifts.find({'_id': shifts[0].shift_id}, function(err, shift){
+      Pickup.find({'_id': shifts[0].shift_id },function(err, shifts){
         if (err) {
           console.error(err.message);
           res.status(404).send({error: err.message});
