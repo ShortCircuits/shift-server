@@ -215,40 +215,58 @@ routes.patch('/users', isAuthenticated, function(req, res){
 })
 
 // Rate thy user :: TODO needs isAuthenticated
-routes.patch('/rateuser', function(req, res){
+routes.patch('/rateuser', isAuthenticated, function(req, res){
   var reps;
 
   // needs: req.body.rep, req.body.shift_id
 
-  // TODO has to check if the shift switch has happened already ie time expired
-
-  Pickup.find({shift_id: req.body.shift_id},function(err, shifts){
+  Pickup.find({'_id': req.body.pickup_shift_id},function(err, shifts){
     if (err) {
       console.error(err.message);
       res.status(404).send({error: err.message});
     }
-    //wishfull programing
-    var requester = shifts.user_requested;
-    // if positive set var to pos and vice versa
-    if(req.body.rep){
-      if(req.body.rep === 'positive'){
-        reps = 'rating.positive';
-      }else if(req.body.rep === 'negative'){
-        reps = 'rating.negative';
-      }
-    }
-
-    // if user requested is part of the pickup shift then procede with updating his reps;
-    Users.findOneAndUpdate({_id: requester}, {$inc: {"rating.positive": 1}},function(err, items){
+    
+    Shifts.find({'_id': shifts[0].shift_id}, function(err, shift){
       if (err) {
         console.error(err.message);
         res.status(404).send({error: err.message});
       }
-      res.status(201).send(items);
+      
+      // check to see if the shift has ended before leting users vote on reps.
+      var shiftTime = shift[0].shift_end;
+      var currTime = new Date();
+      if(currTime > shiftTime){
+        // check to see if the person adding reps is the owner of the shift;
+        if(shifts[0].shift_owner === req.user._id){  
+          console.log("this is shifts", shifts)
+          var requester = shifts[0].user_requested;
+          // if positive set var to pos and vice versa
+          if(req.body.rep){
+            if(req.body.rep === 'positive'){
+              reps = 'rating.positive';
+            }else if(req.body.rep === 'negative'){
+              reps = 'rating.negative';
+            }else{
+              res.status(301).send("wrong reputation attribute")
+            }
+          }
+
+          var action = {};
+          action[reps] = 1; 
+
+          // if user requested is part of the pickup shift then procede with updating his reps;
+          Users.findOneAndUpdate({'_id': requester}, {$inc: action},function(err, items){
+            if (err) {
+              console.error(err.message);
+              res.status(404).send({error: err.message});
+            }
+            res.status(201).send("Successfuly added a rep");
+          })
+        }
+      }
     })
-
   })
-
+  res.status(500).send("could not submit the rating");
 })
 
 //=========================
