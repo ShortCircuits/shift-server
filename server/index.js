@@ -258,7 +258,7 @@ routes.patch('/rateuser', isAuthenticated, function(req, res){
                 console.error(err.message);
                 res.status(404).send({error: err.message});
               }
-              res.status(201).send("Successfuly added a rep");
+              // res.status(201).send("Successfuly added a rep");
             })
           }
         }
