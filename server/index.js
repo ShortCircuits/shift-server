@@ -224,8 +224,8 @@ routes.patch('/rateuser', isAuthenticated, function(req, res){
       res.status(404).send({error: err.message});
     }
     console.log("this is pickup shift id passed in from vote user ", req.body.pickup_shift_id)
-    if(shifts[0]){
-      Pickup.find({'_id': shifts[0].shift_id },function(err, shifts){
+    if(shift[0]){
+      Pickup.find({'_id': shift[0].shift_id },function(err, shifts){
         if (err) {
           console.error(err.message);
           res.status(404).send({error: err.message});
