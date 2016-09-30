@@ -214,6 +214,43 @@ routes.patch('/users', isAuthenticated, function(req, res){
   })
 })
 
+// Rate thy user :: TODO needs isAuthenticated
+routes.patch('/rateuser', function(req, res){
+  var reps;
+
+  // needs: req.body.rep, req.body.shift_id
+
+  // TODO has to check if the shift switch has happened already ie time expired
+
+  Pickup.find({shift_id: req.body.shift_id},function(err, shifts){
+    if (err) {
+      console.error(err.message);
+      res.status(404).send({error: err.message});
+    }
+    //wishfull programing
+    var requester = shifts.user_requested;
+    // if positive set var to pos and vice versa
+    if(req.body.rep){
+      if(req.body.rep === 'positive'){
+        reps = 'rating.positive';
+      }else if(req.body.rep === 'negative'){
+        reps = 'rating.negative';
+      }
+    }
+
+    // if user requested is part of the pickup shift then procede with updating his reps;
+    Users.findOneAndUpdate({_id: requester}, {$inc: {"rating.positive": 1}},function(err, items){
+      if (err) {
+        console.error(err.message);
+        res.status(404).send({error: err.message});
+      }
+      res.status(201).send(items);
+    })
+
+  })
+
+})
+
 //=========================
 //  /areaSearch Endpoints
 //=========================
