@@ -246,8 +246,6 @@ routes.patch('/rateuser', isAuthenticated, function(req, res){
                 reps = 'rating.positive';
               }else if(req.body.rep === 'negative'){
                 reps = 'rating.negative';
-              }else{
-                res.status(301).send("wrong reputation attribute")
               }
             }
 
