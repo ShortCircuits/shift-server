@@ -265,7 +265,7 @@ routes.patch('/rateuser', isAuthenticated, function(req, res){
       })
     }
   })
-  // res.status(500).send("could not submit the rating");
+  res.send("could not submit the rating");
 })
 
 //=========================
