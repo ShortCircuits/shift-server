@@ -272,6 +272,23 @@ routes.patch('/rateuser', isAuthenticated, function(req, res){
 })
 
 //=========================
+//  /message Endpoints
+//=========================
+
+routes.get('/messages', function(req, res) {
+  console.log("message request is: ", req.user._id)
+  var id = req.user._id;
+
+  Messages.find({sent_to: id}, function(err, messages){
+    if(err) {
+      res.status(500).send({error:err.message});
+    }
+    res.send(messages);
+  })
+
+});
+
+//=========================
 //  /areaSearch Endpoints
 //=========================
 
