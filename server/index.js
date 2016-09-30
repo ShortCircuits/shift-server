@@ -261,6 +261,8 @@ routes.patch('/rateuser', isAuthenticated, function(req, res){
               res.status(201).send("Successfuly added a rep");
             })
           }
+        }else{
+           res.status(301).send("Shift has not yet happened, so no");
         }
       })
     }else{
