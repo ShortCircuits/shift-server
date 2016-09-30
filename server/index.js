@@ -217,7 +217,7 @@ routes.patch('/rateuser', isAuthenticated, function(req, res){
   var reps;
 
   // needs: req.body.rep, req.body.shift_id
-
+  console.log("this is user request body ", req.body)
   Pickup.find({'_id': req.body.pickup_shift_id},function(err, shifts){
     if (err) {
       console.error(err.message);
