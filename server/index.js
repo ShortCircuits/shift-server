@@ -50,12 +50,10 @@ routes.get('/protected', isAuthenticated, function(req,res){
 //=========================
 
 routes.get('/pickup', isAuthenticated, function(req, res) {
-  console.log("get pickup req body: ", req.body);
   helpers.findPickupShifts(req, res);
 });
 
 routes.get('/allpickups', isAuthenticated, function(req, res) {
-  console.log("get pickup req body: ", req.body);
   helpers.allPickupShifts(req, res);
 });
 
@@ -74,17 +72,19 @@ routes.get('/allpickups', isAuthenticated, function(req, res) {
 
 //TODO: needs to check if the pickup shift already exists
 routes.post('/pickup', isAuthenticated, function(req, res){
-  console.log("pickup req.body: ", req.body);
   var user = req.user._id;
+  var name = req.user.name;
   req.body.user_requested = user;
+  req.body.user_requested_name = name;
   req.body.approved = false;
   // insert shift owner into restricted field
   req.body.restricted = req.body.shift_owner;
   // find all pickups 
+
     var NewPickup = new Pickup(req.body);
     NewPickup.save(function(err, post){
       if(err){
-        console.log("Error in pickup shift")
+        console.error("Error in pickup shift")
         res.status(500).send({error: err.message})
       }
       res.status(201).send(post);
@@ -99,10 +99,6 @@ routes.patch('/pickup', isAuthenticated, function(req, res) {
       console.error(err.message);
       res.status(404).send({error: err.message});
     }
-    
-      console.log("this is shifts: ", shifts)
-      console.log("this is the shifts.shift_owner: ", shifts[0].shift_owner);
-      console.log("this is the req.user._id: ", req.user._id);
       // If the user making the approval is the same as the shift owner allow update patch to /pickup
       if(req.user._id === shifts[0].shift_owner){
         Pickup.findOneAndUpdate({_id: req.body.pickup_shift_id}, { approved: true }, function(err, shift) {
@@ -131,10 +127,10 @@ routes.patch('/pickupreject', isAuthenticated, function(req, res) {
       res.status(404).send({error: err.message});
     }
       
-      console.log("this is shifts: ", shifts)
-      console.log("this is the requester: ", shifts[0].user_requested)
-      console.log("this is the shifts.shift_owner: ", shifts[0].shift_owner);
-      console.log("this is the req.user._id: ", req.user._id);
+      // console.log("this is shifts: ", shifts)
+      // console.log("this is the requester: ", shifts[0].user_requested)
+      // console.log("this is the shifts.shift_owner: ", shifts[0].shift_owner);
+      // console.log("this is the req.user._id: ", req.user._id);
       // If the user making the approval is the same as the shift owner allow update patch to /pickup
       if(req.user._id === shifts[0].shift_owner){
         // remove the row where the shiftId and user requested match the rejected requester's
@@ -167,9 +163,9 @@ routes.get('/whoami', function(req, res) {
 // get Profile info to generate profile page on front end 
 routes.get('/getProfileInfo', isAuthenticated, function(req,res){
   var user = req.user._id;
-  console.log("=======req.user:", req.user);
+ // console.log("=======req.user:", req.user);
   Users.find({_id: user}, function(err, profileInfo){
-    console.log("========profileInfo:", profileInfo);
+  //  console.log("========profileInfo:", profileInfo);
     if (err) {
       console.error(err.message);
       res.status(404).send({error: err.message});
@@ -204,8 +200,8 @@ routes.get('/user/id/:id', isAuthenticated, function(req, res) {
 
 routes.patch('/users', isAuthenticated, function(req, res){
   var user = req.user._id;
-  console.log("user is: ", user);
-  console.log("req.body: ", req.body);
+  // console.log("user is: ", user);
+  // console.log("req.body: ", req.body);
   Users.findOneAndUpdate({_id: user}, {$set: req.body}, {new: true}, function(err, userData) {
     if (err) {
       console.error(err.message);
@@ -220,14 +216,14 @@ routes.patch('/rateuser', isAuthenticated, function(req, res){
   var reps;
 
   // needs: req.body.rep, req.body.shift_id
-  console.log("this is user request body ", req.body)
+  // console.log("this is user request body ", req.body)
   Pickup.find({'_id': req.body.pickup_shift_id},function(err, shifts){
     if (err) {
       console.error(err.message);
       res.status(404).send({error: err.message});
     }
-    console.log("this is pickup shift id passed in from vote user ", req.body.pickup_shift_id)
-    console.log("this is the shift from pickup", shifts)
+    // console.log("this is pickup shift id passed in from vote user ", req.body.pickup_shift_id)
+    // console.log("this is the shift from pickup", shifts)
     if(shifts[0]){
       Shifts.find({'_id': shifts[0].shift_id}, function(err, shift){
         if (err) {
@@ -241,7 +237,7 @@ routes.patch('/rateuser', isAuthenticated, function(req, res){
         if(currTime > shiftTime){
           // check to see if the person adding reps is the owner of the shift;
           if(shifts[0].shift_owner === req.user._id){  
-            console.log("this is shifts", shifts)
+            // console.log("this is shifts", shifts)
             var requester = shifts[0].user_requested;
             // if positive set var to pos and vice versa
             if(req.body.rep){
@@ -386,7 +382,7 @@ routes.patch('/shifts', isAuthenticated, function(req, res){
 routes.patch('/shiftsreject', isAuthenticated, function(req, res){
   // { _id: afhaksjfhksaj, changed: { prize : 25.00, shift_end : "Sat Sep 24 2016 22:00:00 GMT-0500 (CDT)" } }
   // console.log("REQ.BODY -=-=-=>: ", req.body);
-  console.log("REQUESTER -=-=-=>: ", req.body.requester);
+  // console.log("REQUESTER -=-=-=>: ", req.body.requester);
   Shifts.findOneAndUpdate({_id: req.body._id}, { $push: {restricted: req.body.requester} }, function(err, shift) {
     if (err) {
       console.error(err.message);
@@ -397,7 +393,7 @@ routes.patch('/shiftsreject', isAuthenticated, function(req, res){
 })
 
 routes.delete('/shifts', isAuthenticated, function(req, res) {
-  console.log("this is the delete body: ", req.body);
+ // console.log("this is the delete body: ", req.body);
   Shifts.remove(req.body, function(err){
     if(err) {
       console.error(err.message);
@@ -457,7 +453,8 @@ if(process.env.NODE_ENV !== 'test') {
     req.isAuthenticated = token.isAuthenticated();
     req.tokenPayload = token.getPayload();
     req.user = {
-      _id: req.tokenPayload._id
+      _id: req.tokenPayload._id,
+      name: req.tokenPayload.firstName + " " + req.tokenPayload.lastName
     };
     next();
   });

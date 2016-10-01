@@ -2,6 +2,7 @@ var mongoose = require('mongoose');
 
 var pickupSchema = new mongoose.Schema({
   user_requested: String,
+  user_requested_name: String,
   shift_id: String,
   shift_owner: String,
   shift_owner_name: String,
