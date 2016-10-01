@@ -196,6 +196,7 @@ routes.get('/user/id/:id', isAuthenticated, function(req, res) {
         firstName: user.firstName,
         lastName: user.lastName,
         email: user.email,
+        phone: user.phone,
         profiles: user.profiles
       }
       res.send(info);
