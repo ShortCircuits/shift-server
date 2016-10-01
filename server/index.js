@@ -296,7 +296,7 @@ routes.post('/messages', isAuthenticated, function(req, res){
   var NewMessage = new Message(req.body);
   NewMessage.save(function(err, post){
     if(err){
-      console.log("Error in pickup shift")
+      console.log("Error in post messages")
       res.status(500).send({error: err.message})
     }
     res.status(201).send(post);
