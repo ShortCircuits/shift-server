@@ -9,7 +9,8 @@ var Shifts = require('./model/shifts');
 var Chats = require('./model/chats');
 var helpers = require('./config/helpers');
 var isAuthenticated = require('./config/helpers').isAuthenticated;
-var Pickup = require('./model/pickup')
+var Pickup = require('./model/pickup');
+var Message = require('./model/message')
 
 var AuthModule = require('./config/AuthModule');
 var TokenService = require('./config/TokenService');
@@ -292,20 +293,14 @@ routes.get('/messages', isAuthenticated, function(req, res) {
 
 routes.post('/messages', isAuthenticated, function(req, res){
   console.log("message req.body: ", req.body);
-  // var user = req.user._id;
-  // req.body.read = false;
-  // req.body.sent_by = user;
-  // insert shift owner into restricted field
-  // req.body.restricted = req.body.shift_owner;
-  // find all pickups 
-    // var NewMessage = new Message(req.body);
-    // NewMessage.save(function(err, post){
-    //   if(err){
-    //     console.log("Error in pickup shift")
-    //     res.status(500).send({error: err.message})
-    //   }
-    //   res.status(201).send(post);
-    // })
+  var NewMessage = new Message(req.body);
+  NewMessage.save(function(err, post){
+    if(err){
+      console.log("Error in pickup shift")
+      res.status(500).send({error: err.message})
+    }
+    res.status(201).send(post);
+  })
 })
 
 //=========================
