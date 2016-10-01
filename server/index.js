@@ -372,7 +372,7 @@ routes.patch('/shiftsreject', isAuthenticated, function(req, res){
   // { _id: afhaksjfhksaj, changed: { prize : 25.00, shift_end : "Sat Sep 24 2016 22:00:00 GMT-0500 (CDT)" } }
   // console.log("REQ.BODY -=-=-=>: ", req.body);
   console.log("REQUESTER -=-=-=>: ", req.body.requester);
-  Shifts.findOneAndUpdate({_id: req.body._id}, { $push: {restricted: req.body.requester} }, {new: true}, function(err, shift) {
+  Shifts.findOneAndUpdate({_id: req.body._id}, { $push: {restricted: req.body.requester} }, function(err, shift) {
     if (err) {
       console.error(err.message);
       res.status(404).send({error: err.message});
