@@ -5,6 +5,7 @@ var messageSchema = new mongoose.Schema({
   sent_to: String,
   message: String,
   read: Boolean,
+  dtg: Date
 });
 
 var Message = module.exports = mongoose.model('Message', messageSchema);

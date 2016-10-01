@@ -280,7 +280,7 @@ routes.patch('/rateuser', isAuthenticated, function(req, res){
 //  /message Endpoints
 //=========================
 
-routes.get('/messages', function(req, res) {
+routes.get('/messages', isAuthenticated, function(req, res) {
   console.log("message request is: ", req.user._id)
   var id = req.user._id;
 
@@ -292,6 +292,24 @@ routes.get('/messages', function(req, res) {
   })
 
 });
+
+routes.post('/messages', isAuthenticated, function(req, res){
+  console.log("message req.body: ", req.body);
+  var user = req.user._id;
+  req.body.read = false;
+  req.body.sent_by = user;
+  // insert shift owner into restricted field
+  req.body.restricted = req.body.shift_owner;
+  // find all pickups 
+    var NewMessage = new Message(req.body);
+    NewMessage.save(function(err, post){
+      if(err){
+        console.log("Error in pickup shift")
+        res.status(500).send({error: err.message})
+      }
+      res.status(201).send(post);
+    })
+})
 
 //=========================
 //  /areaSearch Endpoints
