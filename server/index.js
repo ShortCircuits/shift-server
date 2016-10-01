@@ -93,7 +93,7 @@ routes.post('/pickup', isAuthenticated, function(req, res){
 // Aproving shift :: TODO needs testing
 routes.patch('/pickup', isAuthenticated, function(req, res) {
   // console.log("req.body: ", req.body);
-  Pickup.find({shift_id: req.body.shift_id},function(err, shifts){
+  Pickup.find({_id: req.body.pickup_shift_id},function(err, shifts){
     if (err) {
       console.error(err.message);
       res.status(404).send({error: err.message});
@@ -104,7 +104,7 @@ routes.patch('/pickup', isAuthenticated, function(req, res) {
       console.log("this is the req.user._id: ", req.user._id);
       // If the user making the approval is the same as the shift owner allow update patch to /pickup
       if(req.user._id === shifts[0].shift_owner){
-        Pickup.findOneAndUpdate({shift_id: req.body.shift_id}, { approved: true }, function(err, shift) {
+        Pickup.findOneAndUpdate({_id: req.body.pickup_shift_id}, { approved: true }, function(err, shift) {
           if (err) {
             console.error(err.message);
             res.status(404).send({error: err.message});
@@ -124,7 +124,7 @@ routes.patch('/pickup', isAuthenticated, function(req, res) {
 // endpoint which removes pickups after approver rejects the request
 routes.patch('/pickupreject', isAuthenticated, function(req, res) {
   // console.log("req.body: ", req.body);
-  Pickup.find({shift_id: req.body.shift_id},function(err, shifts){
+  Pickup.find({_id: req.body.pickup_shift_id},function(err, shifts){
     if (err) {
       console.error(err.message);
       res.status(404).send({error: err.message});
@@ -137,7 +137,7 @@ routes.patch('/pickupreject', isAuthenticated, function(req, res) {
       // If the user making the approval is the same as the shift owner allow update patch to /pickup
       if(req.user._id === shifts[0].shift_owner){
         // remove the row where the shiftId and user requested match the rejected requester's
-        Pickup.remove( {$and: [{ shift_id: req.body.shift_id }, { user_requested: shifts[0].user_requested }]}, function(err, shift) {
+        Pickup.remove( {$and: [{ _id: req.body.pickup_shift_id }, { user_requested: shifts[0].user_requested }]}, function(err, shift) {
           if (err) {
             console.error(err.message);
             res.status(404).send({error: err.message});
