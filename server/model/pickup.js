@@ -7,6 +7,7 @@ var pickupSchema = new mongoose.Schema({
   shift_owner_name: String,
   shift_where: String,
   shift_when: String,
+  shift_prize: String,
   approved: Boolean,
 });
 
