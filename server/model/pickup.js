@@ -8,7 +8,7 @@ var pickupSchema = new mongoose.Schema({
   shift_where: String,
   shift_when: String,
   shift_prize: String,
-  shitf_start: Date,
+  shift_start: Date,
   shift_end: Date,
   approved: Boolean,
 });
