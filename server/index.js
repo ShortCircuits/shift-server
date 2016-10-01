@@ -282,7 +282,7 @@ routes.get('/messages', isAuthenticated, function(req, res) {
   console.log("message request is: ", req.user._id)
   var id = req.user._id;
 
-  Messages.find({sent_to: id}, function(err, messages){
+  Messages.find({sent_to: id, read: false}, function(err, messages){
     if(err) {
       res.status(500).send({error:err.message});
     }
