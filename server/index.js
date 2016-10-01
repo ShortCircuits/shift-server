@@ -68,7 +68,7 @@ routes.get('/pickup', isAuthenticated, function(req, res) {
 
 //TODO: needs to check if the pickup shift already exists
 routes.post('/pickup', isAuthenticated, function(req, res){
-  console.log("req.body: ", req.body);
+  console.log("pickup req.body: ", req.body);
   var user = req.user._id;
   req.body.user_requested = user;
   req.body.approved = false;
@@ -394,6 +394,15 @@ routes.delete('/shifts', isAuthenticated, function(req, res) {
 
 routes.get('/myshifts', isAuthenticated, function(req, res) {
   Shifts.find({submitted_by: req.user._id}, function(err, shifts){
+    if(err) {
+      res.status(500).send({error:err.message});
+    }
+    res.send(shifts);
+  })
+})
+
+routes.get('/shiftsIPickedUp', isAuthenticated, function(req, res) {
+  Pickup.find({user_requested: req.user._id}, function(err, shifts){
     if(err) {
       res.status(500).send({error:err.message});
     }
