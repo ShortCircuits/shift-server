@@ -57,6 +57,23 @@ module.exports = {
     })
   },
 
+  allPickupShifts: function(req, res){
+    var shifts = [];
+    Pickup.find({$or: [{user_requested: req.user._id}, {shift_owner: req.user._id}]}, function(err, items) {
+      if(err) {
+        res.status(500).send({error: err.message});
+      } 
+      items.forEach(function(row){
+        if(row.user_requested === req.user._id){
+          shifts.push(row)
+        }else if(row.shift_owner === req.user._id){
+          shifts.push(row)
+        }
+      })
+      res.send(shifts);
+    })
+  },
+
   // TODO => once the user has reviewed the request for his shift to be covered
   // this endpoint will be triggered => endpoint itself needs to be added
   shiftAproval: function(){

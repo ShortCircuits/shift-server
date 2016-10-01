@@ -53,6 +53,11 @@ routes.get('/pickup', isAuthenticated, function(req, res) {
   helpers.findPickupShifts(req, res);
 });
 
+routes.get('/allpickups', isAuthenticated, function(req, res) {
+  console.log("get pickup req body: ", req.body);
+  helpers.allPickupShifts(req, res);
+});
+
 
 // test endpoint for getting different pickups/requesters by shift Id
 // routes.get('/pickup/requesters/:shiftid', function(req, res) {
