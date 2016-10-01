@@ -4,7 +4,10 @@ var pickupSchema = new mongoose.Schema({
   user_requested: String,
   shift_id: String,
   shift_owner: String,
-  approved: Boolean
+  shift_owner_name: String,
+  shift_where: String,
+  shift_when: String,
+  approved: Boolean,
 });
 
 pickupSchema.index({ user_requested: 1, shift_id: 1}, { unique: true })
