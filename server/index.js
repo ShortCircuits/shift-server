@@ -177,11 +177,7 @@ routes.get('/getProfileInfo', isAuthenticated, function(req,res){
   });
 });
 
-//=========================
-//    /user Endpoints
-//=========================
-
-//use this rout to find a user's database information, takes the id being passed in the body
+//use this rout to find another user's database information, takes the id being passed in the body
 //user id gets passed in the parms /user/id/5aee23431243fsdh32230034
 routes.get('/user/id/:id', isAuthenticated, function(req, res) {
   var id = req.params.id;
@@ -196,6 +192,7 @@ routes.get('/user/id/:id', isAuthenticated, function(req, res) {
         firstName: user.firstName,
         lastName: user.lastName,
         email: user.email,
+        phone: user.phone,
         profiles: user.profiles
       }
       res.send(info);
@@ -280,7 +277,7 @@ routes.patch('/rateuser', isAuthenticated, function(req, res){
 //  /message Endpoints
 //=========================
 
-routes.get('/messages', function(req, res) {
+routes.get('/messages', isAuthenticated, function(req, res) {
   console.log("message request is: ", req.user._id)
   var id = req.user._id;
 
@@ -292,6 +289,24 @@ routes.get('/messages', function(req, res) {
   })
 
 });
+
+routes.post('/messages', isAuthenticated, function(req, res){
+  console.log("message req.body: ", req.body);
+  var user = req.user._id;
+  req.body.read = false;
+  req.body.sent_by = user;
+  // insert shift owner into restricted field
+  req.body.restricted = req.body.shift_owner;
+  // find all pickups 
+    var NewMessage = new Message(req.body);
+    NewMessage.save(function(err, post){
+      if(err){
+        console.log("Error in pickup shift")
+        res.status(500).send({error: err.message})
+      }
+      res.status(201).send(post);
+    })
+})
 
 //=========================
 //  /areaSearch Endpoints
