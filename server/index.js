@@ -393,7 +393,7 @@ routes.patch('/shiftsreject', isAuthenticated, function(req, res){
   })
 })
 
-routes.delete('/shifts', isAuthenticated, function(req, res) {
+routes.delete('/shifts', isAuthenticated, helpers.deletePickups, function(req, res) {
  // console.log("this is the delete body: ", req.body);
   Shifts.remove(req.body, function(err){
     if(err) {
