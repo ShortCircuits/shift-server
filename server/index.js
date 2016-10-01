@@ -334,7 +334,7 @@ routes.get('/areaSearch/address/:address', isAuthenticated, function(req, res) {
 //=========================
 
 
-routes.get('/shifts/lat/:lat/lng/:lng/rad/:rad', isAuthenticated, function(req, res) {
+routes.get('/shifts/lat/:lat/lng/:lng/rad/:rad', function(req, res) {
   //  data comes in get request shifts/lat/30.27809839999999/lng/-97.74443280000003/rad/500
   request('https://maps.googleapis.com/maps/api/place/nearbysearch/json?location='
     + req.params.lat + ',' + req.params.lng + '&radius=' + req.params.rad +'&name=starbucks&key=' + api,
