@@ -177,11 +177,7 @@ routes.get('/getProfileInfo', isAuthenticated, function(req,res){
   });
 });
 
-//=========================
-//    /user Endpoints
-//=========================
-
-//use this rout to find a user's database information, takes the id being passed in the body
+//use this rout to find another user's database information, takes the id being passed in the body
 //user id gets passed in the parms /user/id/5aee23431243fsdh32230034
 routes.get('/user/id/:id', isAuthenticated, function(req, res) {
   var id = req.params.id;
