@@ -194,7 +194,8 @@ routes.get('/user/id/:id', isAuthenticated, function(req, res) {
         lastName: user.lastName,
         email: user.email,
         phone: user.phone,
-        profiles: user.profiles
+        profiles: user.profiles,
+        rating: {positive: user.rating.positive, negative: user.rating.negative}
       }
       res.send(info);
     }
