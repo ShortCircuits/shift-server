@@ -223,9 +223,11 @@ routes.patch('/rateuser', isAuthenticated, function(req, res){
       console.error(err.message);
       res.status(404).send({error: err.message});
     }
+
     // console.log("this is pickup shift id passed in from vote user ", req.body.pickup_shift_id)
     // console.log("this is the shift from pickup", shifts)
     if(shifts[0]){
+
       Shifts.find({'_id': shifts[0].shift_id}, function(err, shift){
         if (err) {
           console.error(err.message);
@@ -251,14 +253,22 @@ routes.patch('/rateuser', isAuthenticated, function(req, res){
 
             var action = {};
             action[reps] = 1; 
-            var leSet = {'voted':true};
+            
               // { $set: { "name" : "A.B. Abracus", "assignment" : 5}, $inc : { "points" : 5 } }
             // if user requested is part of the pickup shift then procede with updating his reps;
-            Users.findOneAndUpdate({'_id': requester}, {$set: leSet , $inc: action },function(err, items){
+            Users.findOneAndUpdate({'_id': requester}, { $inc: action },function(err, items){
               if (err) {
                 console.error(err.message);
                 res.status(404).send({error: err.message});
               }
+              Pickup.findOneAndUpdate({'_id': req.body.pickup_shift_id},{'voted':true},function(err, items){
+                if (err) {
+                  console.error(err.message);
+                  res.status(404).send({error: err.message});
+                }
+                console.log("updating voted status")
+              })
+
               res.status(201).send("Successfuly added a rep");
             });
           }
