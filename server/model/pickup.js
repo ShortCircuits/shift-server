@@ -15,6 +15,6 @@ var pickupSchema = new mongoose.Schema({
   voted: Boolean
 });
 
-pickupSchema.index({ user_requested: 1, shift_id: 1}, { unique: true })
+pickupSchema.index({ user_requested: 1, shift_owner: 1}, { unique: true })
 
 var Pickup = module.exports = mongoose.model('Pickup', pickupSchema);
