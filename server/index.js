@@ -216,18 +216,12 @@ routes.patch('/users', isAuthenticated, function(req, res){
 routes.patch('/rateuser', isAuthenticated, function(req, res){
   var reps;
 
-  // needs: req.body.rep, req.body.shift_id
-  // console.log("this is user request body ", req.body)
   Pickup.find({'_id': req.body.pickup_shift_id},function(err, shifts){
     if (err) {
       console.error(err.message);
       res.status(404).send({error: err.message});
     }
-
-    // console.log("this is pickup shift id passed in from vote user ", req.body.pickup_shift_id)
-    // console.log("this is the shift from pickup", shifts)
     if(shifts[0]){
-
       Shifts.find({'_id': shifts[0].shift_id}, function(err, shift){
         if (err) {
           console.error(err.message);
@@ -250,11 +244,10 @@ routes.patch('/rateuser', isAuthenticated, function(req, res){
                 reps = 'rating.negative';
               }
             }
-
             var action = {};
             action[reps] = 1; 
             
-              // { $set: { "name" : "A.B. Abracus", "assignment" : 5}, $inc : { "points" : 5 } }
+            // { $set: { "name" : "A.B. Abracus", "assignment" : 5}, $inc : { "points" : 5 } }
             // if user requested is part of the pickup shift then procede with updating his reps;
             Users.findOneAndUpdate({'_id': requester}, { $inc: action },function(err, items){
               if (err) {
