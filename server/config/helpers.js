@@ -39,6 +39,7 @@ module.exports = {
   }, // end of our helper function
   findPickupShifts: function(req, res){
     var shifts = [];
+    // its possible that user requested and shift owner have pickups :: TODO
     Pickup.find({$or: [{user_requested: req.user._id}, {shift_owner: req.user._id}]}, function(err, items) {
       if(err) {
         console.error("pickupShifts error: ", err.message);
