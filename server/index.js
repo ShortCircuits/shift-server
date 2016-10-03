@@ -251,9 +251,10 @@ routes.patch('/rateuser', isAuthenticated, function(req, res){
 
             var action = {};
             action[reps] = 1; 
-
+            var leSet = {'voted':true};
+              // { $set: { "name" : "A.B. Abracus", "assignment" : 5}, $inc : { "points" : 5 } }
             // if user requested is part of the pickup shift then procede with updating his reps;
-            Users.findOneAndUpdate({'_id': requester}, {'voted':true, $inc: action },function(err, items){
+            Users.findOneAndUpdate({'_id': requester}, {$set: leSet , $inc: action },function(err, items){
               if (err) {
                 console.error(err.message);
                 res.status(404).send({error: err.message});
