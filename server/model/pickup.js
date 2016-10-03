@@ -12,6 +12,7 @@ var pickupSchema = new mongoose.Schema({
   shift_start: Date,
   shift_end: Date,
   approved: Boolean,
+  voted: Boolean
 });
 
 pickupSchema.index({ user_requested: 1, shift_id: 1}, { unique: true })
