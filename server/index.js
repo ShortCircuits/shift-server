@@ -258,11 +258,11 @@ routes.patch('/rateuser', isAuthenticated, function(req, res){
                 console.error(err.message);
                 res.status(404).send({error: err.message});
               }
-              // res.status(201).send("Successfuly added a rep");
+              res.status(201).send("Successfuly added a rep");
             });
           }
         }else{
-           res.status(301).send("Shift has not yet happened, so no");
+           res.status(303).send("Shift has not yet happened, so no");
         }
       })
     }else{
