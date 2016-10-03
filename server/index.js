@@ -253,13 +253,14 @@ routes.patch('/rateuser', isAuthenticated, function(req, res){
             action[reps] = 1; 
 
             // if user requested is part of the pickup shift then procede with updating his reps;
-            Users.findOneAndUpdate({'_id': requester}, {$inc: action},function(err, items){
+            Users.findOneAndUpdate({'_id': requester}, {$set: {$inc: action, voted:true}},function(err, items){
               if (err) {
                 console.error(err.message);
                 res.status(404).send({error: err.message});
               }
               res.status(201).send("Successfuly added a rep");
-            })
+            });
+
           }
         }else{
            res.status(301).send("Shift has not yet happened, so no");
