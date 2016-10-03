@@ -86,6 +86,17 @@ module.exports = {
       res.send(items);
     })
   },
+
+  deletePickups: function(req, res, next) {
+    Pickup.remove({shift_id: req.body._id}, function(err, pickups) {
+      if(err) {
+        console.error("error removing pickups: ", err.message);
+        return res.status(500).send({error: err.message});
+      }
+      return next()
+
+    })
+  },
     
     //middleware for checking user authentication and locking down endpoints
   isAuthenticated: function(req,res,next){
