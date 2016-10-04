@@ -12,6 +12,7 @@ var pickupSchema = new mongoose.Schema({
   shift_start: Date,
   shift_end: Date,
   approved: Boolean,
+  rejected: Boolean,
   voted: Boolean
 });
 
