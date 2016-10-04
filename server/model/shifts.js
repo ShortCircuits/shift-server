@@ -10,7 +10,8 @@ var shiftsSchema = new mongoose.Schema({
   submitted_by_name: String,
   covered_by: Number,
   covered: Boolean,
-  restricted: Array
+  restricted: Array,
+  requested: Array
 });
 
 var Shifts = module.exports = mongoose.model('Shifts', shiftsSchema);

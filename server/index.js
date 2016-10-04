@@ -87,6 +87,14 @@ routes.post('/pickup', isAuthenticated, function(req, res){
         console.error("Error in pickup shift")
         res.status(500).send({error: err.message})
       }
+
+      Shifts.findOneAndUpdate({_id: req.body._id}, { $push: {requested: user} }, function(err, shift) {
+        if (err) {
+          console.error(err.message);
+          res.status(404).send({error: err.message});
+          }
+        console.log('updated shift with id ',req.body._id )
+      })
       res.status(201).send(post);
     })
 })
@@ -118,36 +126,18 @@ routes.patch('/pickup', isAuthenticated, function(req, res) {
   })
 })
 
-// endpoint which removes pickups after approver rejects the request
+// endpoint which updates pickup shift to have a rejected : true after approver rejects the request
 routes.patch('/pickupreject', isAuthenticated, function(req, res) {
-  // console.log("req.body: ", req.body);
-  Pickup.find({_id: req.body.pickup_shift_id},function(err, shifts){
+  //console.log("req.body for /pickupreject: ", req.body);
+  // grabing the req.user._id via the token service confirms that this request is being made from the
+  // user that owns the original shift, so no other checks need to be made to confirm authentication
+  Pickup.findOneAndUpdate({_id: req.body.pickup_shift_id, shift_owner : req.user._id}, {$set: {rejected : true}}, function(err, data) {
     if (err) {
       console.error(err.message);
       res.status(404).send({error: err.message});
     }
-      
-      // console.log("this is shifts: ", shifts)
-      // console.log("this is the requester: ", shifts[0].user_requested)
-      // console.log("this is the shifts.shift_owner: ", shifts[0].shift_owner);
-      // console.log("this is the req.user._id: ", req.user._id);
-      // If the user making the approval is the same as the shift owner allow update patch to /pickup
-      if(req.user._id === shifts[0].shift_owner){
-        // remove the row where the shiftId and user requested match the rejected requester's
-        Pickup.remove( {$and: [{ _id: req.body.pickup_shift_id }, { user_requested: shifts[0].user_requested }]}, function(err, shift) {
-          if (err) {
-            console.error(err.message);
-            res.status(404).send({error: err.message});
-          }
-          // you can only send one > needs refactoring
-          res.status(200).send(shift);
-        })
-
-      }else{
-        res.status(403).send("sorry you don't have permission to reject this shift")
-      }
-
-
+    console.log("/pickupreject response data looks like this: ", data);
+    res.status(200).send(data);
   })
 });
 
