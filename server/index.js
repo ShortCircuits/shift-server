@@ -155,7 +155,7 @@ routes.get('/getProfileInfo', isAuthenticated, function(req,res){
   var user = req.user._id;
  // console.log("=======req.user:", req.user);
   Users.find({_id: user}, function(err, profileInfo){
-  //  console.log("========profileInfo:", profileInfo);
+  //console.log("========profileInfo:", profileInfo);
     if (err) {
       console.error(err.message);
       res.status(404).send({error: err.message});
