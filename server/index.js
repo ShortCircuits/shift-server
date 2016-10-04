@@ -88,7 +88,7 @@ routes.post('/pickup', isAuthenticated, function(req, res){
         res.status(500).send({error: err.message})
       }
 
-      Shifts.findOneAndUpdate({_id: req.body._id}, { $push: {requested: user} }, function(err, shift) {
+      Shifts.findOneAndUpdate({_id: req.body._id}, { $push: {requested: req.user._id} }, function(err, shift) {
         if (err) {
           console.error(err.message);
           res.status(404).send({error: err.message});
