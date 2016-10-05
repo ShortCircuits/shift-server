@@ -57,7 +57,7 @@ routes.get('/allpickups', isAuthenticated, function(req, res) {
   helpers.allPickupShifts(req, res);
 });
 
-routes.get('/pickup/requesters/', isAuthenticated, function(req, res) {
+routes.get('/pickup/requesters', isAuthenticated, function(req, res) {
   helpers.findRequestsByShift(req, res);
 });
 
