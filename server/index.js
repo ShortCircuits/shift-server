@@ -57,14 +57,8 @@ routes.get('/allpickups', isAuthenticated, function(req, res) {
   helpers.allPickupShifts(req, res);
 });
 
-routes.get('/pickup/requesters/:shiftid', function(req, res) {
-  Pickup.find( {shift_id: req.params.shiftid}, function(err, shifts){
-    if(err) {
-      console.log("Error get pickup/requesters: ", err);
-      res.status(500).send({error: err.message});
-    } 
-    res.send(shifts);
-  })
+routes.get('/pickup/requesters/', isAuthenticated, function(req, res) {
+  helpers.findRequestsByShift(req, res);
 });
 
 //TODO: needs to check if the pickup shift already exists
