@@ -58,15 +58,6 @@ module.exports = {
     })
   },
 
-  findRequestsByShift: function(req, res){
-    Pickup.find({shift_id: req.data.shiftId}, function(err, items) {
-      if(err) {
-        res.status(500).send({error: err.message});
-      } 
-      res.send(items);
-    })
-  },
-
   allPickupShifts: function(req, res){
     var shifts = [];
     Pickup.find({$or: [{user_requested: req.user._id}, {shift_owner: req.user._id}]}, function(err, items) {
