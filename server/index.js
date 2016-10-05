@@ -407,7 +407,7 @@ routes.get('/shiftsIPickedUp', isAuthenticated, function(req, res) {
   })
 })
 
-routes.get('/requestsByShift', isAuthenticated, function(req, res) {
+routes.get('/requestsByShift/:shiftId', isAuthenticated, function(req, res) {
   console.log("======requestsByShift req-p: ", req.params);
   Pickup.find({shift_id: req.params.shiftId}, function(err, items) {
     if(err) {
