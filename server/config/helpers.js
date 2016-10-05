@@ -59,7 +59,7 @@ module.exports = {
   },
 
   findRequestsByShift: function(req, res){
-    Pickup.find({shift_owner: req.user._id}, function(err, items) {
+    Pickup.find({shift_id: req.data.shiftId}, function(err, items) {
       if(err) {
         res.status(500).send({error: err.message});
       } 
