@@ -92,8 +92,8 @@ routes.post('/pickup', isAuthenticated, function(req, res){
 
 // alternative endpoint for handling approvals, using helper function
 routes.patch('/approval', isAuthenticated, function(req,res){
-
-  helpers.handleApproval(shiftId, pickupId, shiftOwnerId, requesterId, requesterName)
+  // req.body includes => shiftId, pickupId, requesterId, requesterName
+  helpers.handleApproval(req,res);
 })
 
 // Approving shift :: TODO needs testing

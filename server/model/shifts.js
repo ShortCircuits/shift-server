@@ -8,7 +8,7 @@ var shiftsSchema = new mongoose.Schema({
   prize: String,
   submitted_by: String,
   submitted_by_name: String,
-  covered_by: Number,
+  covered_by: String,
   covered_by_name: String,
   covered: Boolean,
   restricted: Array,

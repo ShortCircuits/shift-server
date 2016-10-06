@@ -87,6 +87,30 @@ module.exports = {
     })
   },
 
+  handleApproval: function(req, res){
+    Shifts.findOneAndUpdate({_id: shiftId}, {
+      covered: true,
+      covered_by: req.body.requesterId,
+      covered_by_name: req.body.requesterName, 
+      requested: []
+    }, function(error,success){
+      if(err) {
+        res.status(500).send({error: err.message});
+      }
+      Pickup.findOneAndUpdate({_id: pickupId}, {
+        approved: true, 
+        rejected: false
+      }, function(error,success){
+        if(err) {
+        res.status(500).send({error: err.message});
+      }
+      });
+    });
+
+
+    Pickup.update({shift_id: shiftId, _id: {$ne: pickupId}}, {approved: false, rejected: true});
+  },
+
   deletePickups: function(req, res, next) {
     Pickup.remove({shift_id: req.body._id}, function(err, pickups) {
       if(err) {
