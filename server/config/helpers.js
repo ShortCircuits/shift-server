@@ -98,27 +98,29 @@ module.exports = {
         console.log("handleApproval Shifts fOaU failed");
         res.status(500).send({error: error.message});
       }
-      Pickup.findOneAndUpdate({_id: req.body.pickupId}, {
-        approved: true, 
-        rejected: false
-      }, function(error,success){
-        if(error) {
-          console.log("handleApproval Pickup fOaU failed");
-          res.status(500).send({error: error.message});
-        }
-        Pickup.update({shift_id: req.body.shiftId, _id: {$ne: req.body.pickupId}}, {
-          approved: false, 
-          rejected: true
-        }, function(error,success){
-          if(error) {
-            console.log("handleApproval Pickup update failed");
-            res.status(500).send({error: error.message});
-          }
-          res.status(200).send(req.body.shiftId);
-        });
-      });
-    }
-    );
+      console.log("handleApproval Shifts fOaU succeeded")
+    });
+    Pickup.findOneAndUpdate({_id: req.body.pickupId}, {
+      approved: true, 
+      rejected: false
+    }, function(error,success){
+      if(error) {
+        console.log("handleApproval Pickup fOaU failed");
+        res.status(500).send({error: error.message});
+      }
+      console.log("handleApproval Pickup fOaU succeeded")
+    });
+    Pickup.update({shift_id: req.body.shiftId, _id: {$ne: req.body.pickupId}}, {
+      approved: false, 
+      rejected: true
+    }, function(error,success){
+      if(error) {
+        console.log("handleApproval Pickup update failed");
+        res.status(500).send({error: error.message});
+      }
+      console.log("handleApproval Pickup update succeeded")
+      res.status(200).send(req.body.shiftId);
+    });
   },
 
   deletePickups: function(req, res, next) {
