@@ -9,6 +9,7 @@ var shiftsSchema = new mongoose.Schema({
   submitted_by: String,
   submitted_by_name: String,
   covered_by: Number,
+  covered_by_name: String,
   covered: Boolean,
   restricted: Array,
   requested: Array
