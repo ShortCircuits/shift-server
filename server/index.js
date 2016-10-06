@@ -90,7 +90,14 @@ routes.post('/pickup', isAuthenticated, function(req, res){
     })
 })
 
-// Aproving shift :: TODO needs testing
+// alternative endpoint for handling approvals, using helper function
+routes.patch('/approval', isAuthenticated, function(req,res){
+  console.log("=====new approval endpoint req.body", req.body);
+  // req.body includes => shiftId, pickupId, requesterId, requesterName
+  helpers.handleApproval(req,res);
+})
+
+// Approving shift :: TODO needs testing
 routes.patch('/pickup', isAuthenticated, function(req, res) {
   // console.log("req.body: ", req.body);
   Pickup.find({_id: req.body.pickup_shift_id},function(err, shifts){
