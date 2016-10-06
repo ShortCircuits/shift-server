@@ -92,6 +92,7 @@ routes.post('/pickup', isAuthenticated, function(req, res){
 
 // alternative endpoint for handling approvals, using helper function
 routes.patch('/approval', isAuthenticated, function(req,res){
+  console.log("=====new approval endpoint req.body", req.body);
   // req.body includes => shiftId, pickupId, requesterId, requesterName
   helpers.handleApproval(req,res);
 })

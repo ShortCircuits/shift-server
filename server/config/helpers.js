@@ -88,27 +88,37 @@ module.exports = {
   },
 
   handleApproval: function(req, res){
-    Shifts.findOneAndUpdate({_id: shiftId}, {
+    Shifts.findOneAndUpdate({_id: req.body.shiftId}, {
       covered: true,
       covered_by: req.body.requesterId,
       covered_by_name: req.body.requesterName, 
       requested: []
     }, function(error,success){
       if(err) {
+        console.log("handleApproval Shifts fOaU failed");
         res.status(500).send({error: err.message});
       }
-      Pickup.findOneAndUpdate({_id: pickupId}, {
+      Pickup.findOneAndUpdate({_id: req.body.pickupId}, {
         approved: true, 
         rejected: false
       }, function(error,success){
         if(err) {
-        res.status(500).send({error: err.message});
-      }
+          console.log("handleApproval Pickup fOaU failed");
+          res.status(500).send({error: err.message});
+        }
+        Pickup.update({shift_id: req.body.shiftId, _id: {$ne: req.body.pickupId}}, {
+          approved: false, 
+          rejected: true
+        }, function(error,success){
+          if(err) {
+            console.log("handleApproval Pickup update failed");
+            res.status(500).send({error: err.message});
+          }
+          res.status(200).send(req.body.shiftId);
+        });
       });
-    });
-
-
-    Pickup.update({shift_id: shiftId, _id: {$ne: pickupId}}, {approved: false, rejected: true});
+    }
+    );
   },
 
   deletePickups: function(req, res, next) {
