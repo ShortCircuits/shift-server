@@ -113,7 +113,7 @@ module.exports = {
     Pickup.update({shift_id: req.body.shiftId, _id: {$ne: req.body.pickupId}}, {
       approved: false, 
       rejected: true
-    }, function(error,success){
+    }, { multi: true }, function(error,success){
       if(error) {
         console.log("handleApproval Pickup update failed");
         res.status(500).send({error: error.message});
