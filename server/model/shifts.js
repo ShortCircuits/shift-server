@@ -11,6 +11,7 @@ var shiftsSchema = new mongoose.Schema({
   covered_by: String,
   covered_by_name: String,
   covered: Boolean,
+  pickup_approved: String,
   restricted: Array,
   requested: Array
 });

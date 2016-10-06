@@ -91,7 +91,8 @@ module.exports = {
     Shifts.findOneAndUpdate({_id: req.body.shiftId}, {
       covered: true,
       covered_by: req.body.requesterId,
-      covered_by_name: req.body.requesterName, 
+      covered_by_name: req.body.requesterName,
+      pickup_approved: req.body.pickupId,
       requested: []
     }, function(error,success){
       if(error) {
