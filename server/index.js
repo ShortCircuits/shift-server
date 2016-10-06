@@ -108,12 +108,10 @@ routes.patch('/pickup', isAuthenticated, function(req, res) {
           // you can only send one > needs refactoring
           res.status(200).send(shift);
         });
-        Shifts.findOneAndUpdate({_id: req.body.shift_id}, { covered: true });
 
       }else{
         res.status(403).send("sorry you don't have permission to approve this shift")
       }
-
 
   })
 })
