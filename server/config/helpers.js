@@ -45,7 +45,7 @@ module.exports = {
         console.error("pickupShifts error: ", err.message);
         res.status(500).send({error: err.message});
       } 
-      console.log("items ", items)
+      // console.log("items ", items)
       items.forEach(function(row){
         if(row.user_requested === req.user._id && row.approved){
           console.log("the row", row)
