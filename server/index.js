@@ -349,14 +349,24 @@ routes.get('/shifts/lat/:lat/lng/:lng/rad/:rad', function(req, res) {
 });
 
 routes.post('/shifts', isAuthenticated, function(req, res){
-  req.body.submitted_by = req.user._id;
-  var NewShift = new Shifts(req.body);
-  NewShift.save(function(err, post){
-    if (err){
-      console.error('Error in the shifts post');
-      res.status(500).send({error: err.message})
+
+  Shifts.find({submitted_by: req.user._id, shift_start: {$gte: new Date()}}, function(err, shifts){
+    if(err) {
+      res.status(500).send({error:err.message});
     }
-    res.status(201).send(post);
+    if(shifts.length >=5){
+      res.status(403).send("You have reached your active shift limit.")
+    } else {
+      req.body.submitted_by = req.user._id;
+      var NewShift = new Shifts(req.body);
+      NewShift.save(function(err, post){
+        if (err){
+          console.error('Error in the shifts post');
+          res.status(500).send({error: err.message})
+        }
+        res.status(201).send(post);
+      })
+    }
   })
 })
 
