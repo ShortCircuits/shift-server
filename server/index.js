@@ -373,7 +373,7 @@ routes.patch('/shifts', isAuthenticated, function(req, res){
 
 routes.patch('/shiftsreject', isAuthenticated, function(req, res){
   console.log("shiftsreject REQ.BODY -=-=-=>: ", req.body);
-  Shifts.findOneAndUpdate({_id: req.body._id}, { 
+  Shifts.findOneAndUpdate({_id: req.body.shift_id}, { 
     $push: {restricted: req.body.requester},
     $pull: {requested: req.body.requester}
   }, function(err, shift) {
