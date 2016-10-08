@@ -32,23 +32,18 @@ module.exports = {
           }
         }
       }
-      //console.log("the appended google Object is the following: ", googleObj)
-      // return the google Obj with its' appended data
       res.status(200).send(googleObj);
     }) // end of the Shifts.find.
   }, // end of our helper function
   findPickupShifts: function(req, res){
     var shifts = [];
-    // its possible that user requested and shift owner have pickups :: TODO
+
     Pickup.find({$or: [{user_requested: req.user._id}, {shift_owner: req.user._id}]}, function(err, items) {
       if(err) {
-        console.error("pickupShifts error: ", err.message);
         res.status(500).send({error: err.message});
       } 
-      // console.log("items ", items)
       items.forEach(function(row){
         if(row.user_requested === req.user._id && row.approved){
-          console.log("the row", row)
           shifts.push(row)
         }else if(row.shift_owner === req.user._id && !row.approved){
           shifts.push(row)
@@ -75,12 +70,9 @@ module.exports = {
     })
   },
 
-  // TODO => once the user has reviewed the request for his shift to be covered
-  // this endpoint will be triggered => endpoint itself needs to be added
   shiftAproval: function(){
     Pickup.find({shift_owner: req.user._id}, function(err, items) {
       if(err) {
-        console.error("Shift aproval error: ", err.message);
         res.status(500).send({error: err.message});
       } 
       res.send(items);
@@ -96,30 +88,24 @@ module.exports = {
       requested: []
     }, function(error,success){
       if(error) {
-        console.log("handleApproval Shifts fOaU failed");
         res.status(500).send({error: error.message});
       }
-      console.log("handleApproval Shifts fOaU succeeded")
     });
     Pickup.findOneAndUpdate({_id: req.body.pickupId}, {
       approved: true, 
       rejected: false
     }, function(error,success){
       if(error) {
-        console.log("handleApproval Pickup fOaU failed");
         res.status(500).send({error: error.message});
       }
-      console.log("handleApproval Pickup fOaU succeeded")
     });
     Pickup.update({shift_id: req.body.shiftId, _id: {$ne: req.body.pickupId}}, {
       approved: false, 
       rejected: true
     }, { multi: true }, function(error,success){
       if(error) {
-        console.log("handleApproval Pickup update failed");
         res.status(500).send({error: error.message});
       }
-      console.log("handleApproval Pickup update succeeded")
       res.status(200).send(req.body.shiftId);
     });
   },
@@ -127,7 +113,6 @@ module.exports = {
   deletePickups: function(req, res, next) {
     Pickup.remove({shift_id: req.body._id}, function(err, pickups) {
       if(err) {
-        console.error("error removing pickups: ", err.message);
         return res.status(500).send({error: err.message});
       }
       return next()
@@ -138,21 +123,13 @@ module.exports = {
     //middleware for checking user authentication and locking down endpoints
   isAuthenticated: function(req,res,next){
     if(req.isAuthenticated){
-      console.log("isAuthenticated ++++++")
       return next();
     }
     if(req.xhr){
-      console.log("isAuthenticated fail, req.xhr")
       return res.status(401).send({"error": "Unauthorized"});
     } else {
-      console.log("isAuthenticated fail, else")
       return res.status(401).send({"error": "Unauthorized"});
     }
   }
 
 } // end of the module.exports
-
-
-
-
-
