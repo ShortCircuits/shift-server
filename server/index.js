@@ -86,6 +86,7 @@ routes.post('/pickup', isAuthenticated, function(req, res){
         }
         Shifts.findOneAndUpdate({_id: req.body.shift_id}, { $push: {requested: req.user._id} }, function(err, shift) {
           if (err) {
+            console.error(err.message);
             res.status(404).send({error: err.message});
             }
           res.status(201).send(post);
@@ -103,6 +104,7 @@ routes.patch('/approval', isAuthenticated, function(req,res){
 routes.patch('/pickup', isAuthenticated, function(req, res) {
   Pickup.find({_id: req.body.pickup_shift_id},function(err, shifts){
     if (err) {
+      console.error(err.message);
       res.status(404).send({error: err.message});
     }
       // If the user making the approval is the same as the shift owner allow update patch to /pickup
@@ -150,6 +152,7 @@ routes.get('/getProfileInfo', isAuthenticated, function(req,res){
   var user = req.user._id;
   Users.find({_id: user}, function(err, profileInfo){
     if (err) {
+      console.error(err.message);
       res.status(404).send({error: err.message});
     }
     res.status(200).send(profileInfo);
@@ -162,6 +165,7 @@ routes.get('/user/id/:id', isAuthenticated, function(req, res) {
   var id = req.params.id;
   Users.findById(id, function(err, user) {
     if(err) {
+      console.error(err.message);
       res.status(500).send({error: err.message});
     }
     if (user.profilePicture){
