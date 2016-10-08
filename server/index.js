@@ -73,7 +73,6 @@ routes.post('/pickup', isAuthenticated, function(req, res){
   // find all pickups 
 
   Pickup.find({user_requested: req.user._id, shift_start: {$gte: new Date()}}, function(err, items) {
-    console.log("items: ", items);
     if(err) {
       res.status(500).send({error: err.message});
     }
@@ -83,16 +82,12 @@ routes.post('/pickup', isAuthenticated, function(req, res){
       var NewPickup = new Pickup(req.body);
       NewPickup.save(function(err, post){
         if(err){
-          console.error("Error in pickup shift")
           res.status(500).send({error: err.message})
         }
-        console.log('this is shift id :',req.body.shift_id, " and this is user id ", req.user._id)
         Shifts.findOneAndUpdate({_id: req.body.shift_id}, { $push: {requested: req.user._id} }, function(err, shift) {
           if (err) {
-            console.error(err.message);
             res.status(404).send({error: err.message});
             }
-          console.log('updated shift with id ',req.body.shift_id )
           res.status(201).send(post);
         })
       })
@@ -102,17 +97,12 @@ routes.post('/pickup', isAuthenticated, function(req, res){
 
 // alternative endpoint for handling approvals, using helper function
 routes.patch('/approval', isAuthenticated, function(req,res){
-  console.log("=====new approval endpoint req.body", req.body);
-  // req.body includes => shiftId, pickupId, requesterId, requesterName
   helpers.handleApproval(req,res);
 })
 
-// Approving shift :: TODO needs testing
 routes.patch('/pickup', isAuthenticated, function(req, res) {
-  // console.log("req.body: ", req.body);
   Pickup.find({_id: req.body.pickup_shift_id},function(err, shifts){
     if (err) {
-      console.error(err.message);
       res.status(404).send({error: err.message});
     }
       // If the user making the approval is the same as the shift owner allow update patch to /pickup
@@ -122,7 +112,6 @@ routes.patch('/pickup', isAuthenticated, function(req, res) {
             console.error(err.message);
             res.status(404).send({error: err.message});
           }
-          // you can only send one > needs refactoring
           res.status(200).send(shift);
         });
 
@@ -135,7 +124,6 @@ routes.patch('/pickup', isAuthenticated, function(req, res) {
 
 // endpoint which updates pickup shift to have a rejected : true after approver rejects the request
 routes.patch('/pickupreject', isAuthenticated, function(req, res) {
-  //console.log("req.body for /pickupreject: ", req.body);
   // grabing the req.user._id via the token service confirms that this request is being made from the
   // user that owns the original shift, so no other checks need to be made to confirm authentication
   Pickup.findOneAndUpdate({_id: req.body.pickup_shift_id, shift_owner : req.user._id}, {$set: {rejected : true}}, function(err, data) {
@@ -160,11 +148,8 @@ routes.get('/whoami', function(req, res) {
 // get Profile info to generate profile page on front end 
 routes.get('/getProfileInfo', isAuthenticated, function(req,res){
   var user = req.user._id;
- // console.log("=======req.user:", req.user);
   Users.find({_id: user}, function(err, profileInfo){
-  //console.log("========profileInfo:", profileInfo);
     if (err) {
-      console.error(err.message);
       res.status(404).send({error: err.message});
     }
     res.status(200).send(profileInfo);
@@ -177,7 +162,6 @@ routes.get('/user/id/:id', isAuthenticated, function(req, res) {
   var id = req.params.id;
   Users.findById(id, function(err, user) {
     if(err) {
-      console.error(err.message);
       res.status(500).send({error: err.message});
     }
     if (user.profilePicture){
@@ -198,8 +182,6 @@ routes.get('/user/id/:id', isAuthenticated, function(req, res) {
 
 routes.patch('/users', isAuthenticated, function(req, res){
   var user = req.user._id;
-  // console.log("user is: ", user);
-  // console.log("req.body: ", req.body);
   Users.findOneAndUpdate({_id: user}, {$set: req.body}, {new: true}, function(err, userData) {
     if (err) {
       console.error(err.message);
@@ -256,14 +238,12 @@ routes.patch('/rateuser', isAuthenticated, function(req, res){
                   console.error(err.message);
                   res.status(404).send({error: err.message});
                 }
-                console.log("updating voted status")
               })
-
               res.status(201).send("Successfuly added a rep");
             });
           }
         }else{
-           res.status(303).send("Shift has not yet happened, so no");
+          res.status(303).send("Shift has not yet happened, so no");
         }
       })
     }else{
@@ -277,24 +257,19 @@ routes.patch('/rateuser', isAuthenticated, function(req, res){
 //=========================
 
 routes.get('/messages', isAuthenticated, function(req, res) {
-  console.log("message request is: ", req.user._id)
   var id = req.user._id;
-
   Messages.find({sent_to: id, read: false}, function(err, messages){
     if(err) {
       res.status(500).send({error:err.message});
     }
     res.send(messages);
   })
-
 });
 
 routes.post('/messages', isAuthenticated, function(req, res){
-  console.log("message req.body: ", req.body);
   var NewMessage = new Message(req.body);
   NewMessage.save(function(err, post){
     if(err){
-      console.log("Error in post messages")
       res.status(500).send({error: err.message})
     }
     res.status(201).send(post);
@@ -308,12 +283,10 @@ routes.post('/messages', isAuthenticated, function(req, res){
 //start here tomorrow !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!***************************!
 
 routes.get('/areaSearch/address/:address', isAuthenticated, function(req, res) {
-  console.log("made it to server!")
   //  data comes in get request shifts/lat/30.27809839999999/lng/-97.74443280000003/rad/500
   request('https://maps.googleapis.com/maps/api/geocode/json?address=' + req.params.address + '&key=' + api,
     function(err, resp, body) {
       var theBody = JSON.parse(body);
-      // console.log(theBody.status);
       if(err){
         res.status(resp.statusCode).send(err.message);
       }
@@ -324,7 +297,6 @@ routes.get('/areaSearch/address/:address', isAuthenticated, function(req, res) {
         + lat + ',' + lng + '&radius=5000&name=starbucks&key=' + api,
         function(err, resp, body) {
           var theBody = JSON.parse(body);
-          // console.log(TheBody.status);
           if(err){
             res.status(resp.statusCode).send(err.message);
           }
@@ -348,7 +320,6 @@ routes.get('/shifts/lat/:lat/lng/:lng/rad/:rad', function(req, res) {
     + req.params.lat + ',' + req.params.lng + '&radius=' + req.params.rad +'&name=starbucks&key=' + api,
     function(err, resp, body) {
       var theBody = JSON.parse(body);
-      // console.log(TheBody.status);
       if(err){
         res.status(resp.statusCode).send(err.message);
       }
@@ -371,7 +342,6 @@ routes.post('/shifts', isAuthenticated, function(req, res){
       var NewShift = new Shifts(req.body);
       NewShift.save(function(err, post){
         if (err){
-          console.error('Error in the shifts post');
           res.status(500).send({error: err.message})
         }
         res.status(201).send(post);
@@ -392,7 +362,6 @@ routes.patch('/shifts', isAuthenticated, function(req, res){
 })
 
 routes.patch('/shiftsreject', isAuthenticated, function(req, res){
-  console.log("shiftsreject REQ.BODY -=-=-=>: ", req.body);
   Shifts.findOneAndUpdate({_id: req.body.shift_id}, { 
     $push: {restricted: req.body.requester},
     $pull: {requested: req.body.requester}
@@ -406,7 +375,6 @@ routes.patch('/shiftsreject', isAuthenticated, function(req, res){
 })
 
 routes.delete('/shifts', isAuthenticated, helpers.deletePickups, function(req, res) {
- // console.log("this is the delete body: ", req.body);
   Shifts.remove(req.body, function(err){
     if(err) {
       console.error(err.message);
@@ -435,7 +403,6 @@ routes.get('/shiftsIPickedUp', isAuthenticated, function(req, res) {
 })
 
 routes.get('/requestsByShift/:shiftId', isAuthenticated, function(req, res) {
-  console.log("======requestsByShift req-p: ", req.params);
   Pickup.find({shift_id: req.params.shiftId}, function(err, items) {
     if(err) {
       res.status(500).send({error: err.message});
@@ -449,7 +416,6 @@ if(process.env.NODE_ENV !== 'test') {
   // The get shift route returns an object of all google place objects with
   // relevant data from the shift database
 
-  //
   // The Catch-all Route
   // This is for supporting browser history pushstate.
   // NOTE: Make sure this route is always LAST.
