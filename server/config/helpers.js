@@ -13,7 +13,7 @@ module.exports = {
     for(var i = 0; i < storesArray.length; i++){
       storeIds.push(storesArray[i].place_id);
     }
-    // do a db find for any stores that match and store IDs from the google call
+    // do a db find for any stores that match any store IDs from the google call
     Shifts.find({'home_store.storeId': {$in: storeIds}}, function(err, items){
       var dbStoreMatches = items;
       var rightNow = new Date();
