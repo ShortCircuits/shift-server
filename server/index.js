@@ -57,17 +57,8 @@ routes.get('/allpickups', isAuthenticated, function(req, res) {
   helpers.allPickupShifts(req, res);
 });
 
-
-// test endpoint for getting different pickups/requesters by shift Id
-// routes.get('/pickup/requesters/:shiftid', function(req, res) {
-//   console.log("get pickup req shiftid: ", req.params.shiftid);
-//   Pickup.find( {shift_id: req.params.shiftid}, function(err, shifts){
-//     if(err) {
-//       console.log("Error get pickup/requesters: ", err);
-//       res.status(500).send({error: err.message});
-//     } 
-//     res.send(shifts);
-//   })
+// routes.get('/pickup/requesters', isAuthenticated, function(req, res) {
+//   helpers.findRequestsByShift(req, res);
 // });
 
 //TODO: needs to check if the pickup shift already exists
@@ -81,25 +72,42 @@ routes.post('/pickup', isAuthenticated, function(req, res){
   req.body.restricted = req.body.shift_owner;
   // find all pickups 
 
-    var NewPickup = new Pickup(req.body);
-    NewPickup.save(function(err, post){
-      if(err){
-        console.error("Error in pickup shift")
-        res.status(500).send({error: err.message})
-      }
-      console.log('this is shift id :',req.body.shift_id, " and this is user id ", req.user._id)
-      Shifts.findOneAndUpdate({_id: req.body.shift_id}, { $push: {requested: req.user._id} }, function(err, shift) {
-        if (err) {
-          console.error(err.message);
-          res.status(404).send({error: err.message});
-          }
-        console.log('updated shift with id ',req.body.shift_id )
-        res.status(201).send(post);
+  Pickup.find({user_requested: req.user._id, shift_start: {$gte: new Date()}}, function(err, items) {
+    console.log("items: ", items);
+    if(err) {
+      res.status(500).send({error: err.message});
+    }
+    if(items.length >=5){
+      res.status(403).send("You have reached your active pickup limit.")
+    } else {
+      var NewPickup = new Pickup(req.body);
+      NewPickup.save(function(err, post){
+        if(err){
+          console.error("Error in pickup shift")
+          res.status(500).send({error: err.message})
+        }
+        console.log('this is shift id :',req.body.shift_id, " and this is user id ", req.user._id)
+        Shifts.findOneAndUpdate({_id: req.body.shift_id}, { $push: {requested: req.user._id} }, function(err, shift) {
+          if (err) {
+            console.error(err.message);
+            res.status(404).send({error: err.message});
+            }
+          console.log('updated shift with id ',req.body.shift_id )
+          res.status(201).send(post);
+        })
       })
-    })
+    }
+  })
 })
 
-// Aproving shift :: TODO needs testing
+// alternative endpoint for handling approvals, using helper function
+routes.patch('/approval', isAuthenticated, function(req,res){
+  console.log("=====new approval endpoint req.body", req.body);
+  // req.body includes => shiftId, pickupId, requesterId, requesterName
+  helpers.handleApproval(req,res);
+})
+
+// Approving shift :: TODO needs testing
 routes.patch('/pickup', isAuthenticated, function(req, res) {
   // console.log("req.body: ", req.body);
   Pickup.find({_id: req.body.pickup_shift_id},function(err, shifts){
@@ -116,12 +124,11 @@ routes.patch('/pickup', isAuthenticated, function(req, res) {
           }
           // you can only send one > needs refactoring
           res.status(200).send(shift);
-        })
+        });
 
       }else{
-        res.status(403).send("sorry you don't have permission to aprove this shift")
+        res.status(403).send("sorry you don't have permission to approve this shift")
       }
-
 
   })
 })
@@ -352,14 +359,24 @@ routes.get('/shifts/lat/:lat/lng/:lng/rad/:rad', function(req, res) {
 });
 
 routes.post('/shifts', isAuthenticated, function(req, res){
-  req.body.submitted_by = req.user._id;
-  var NewShift = new Shifts(req.body);
-  NewShift.save(function(err, post){
-    if (err){
-      console.error('Error in the shifts post');
-      res.status(500).send({error: err.message})
+
+  Shifts.find({submitted_by: req.user._id, shift_start: {$gte: new Date()}}, function(err, shifts){
+    if(err) {
+      res.status(500).send({error:err.message});
     }
-    res.status(201).send(post);
+    if(shifts.length >=5){
+      res.status(403).send("You have reached your active shift limit.")
+    } else {
+      req.body.submitted_by = req.user._id;
+      var NewShift = new Shifts(req.body);
+      NewShift.save(function(err, post){
+        if (err){
+          console.error('Error in the shifts post');
+          res.status(500).send({error: err.message})
+        }
+        res.status(201).send(post);
+      })
+    }
   })
 })
 
@@ -375,10 +392,11 @@ routes.patch('/shifts', isAuthenticated, function(req, res){
 })
 
 routes.patch('/shiftsreject', isAuthenticated, function(req, res){
-  // { _id: afhaksjfhksaj, changed: { prize : 25.00, shift_end : "Sat Sep 24 2016 22:00:00 GMT-0500 (CDT)" } }
-  // console.log("REQ.BODY -=-=-=>: ", req.body);
-  // console.log("REQUESTER -=-=-=>: ", req.body.requester);
-  Shifts.findOneAndUpdate({_id: req.body._id}, { $push: {restricted: req.body.requester} }, function(err, shift) {
+  console.log("shiftsreject REQ.BODY -=-=-=>: ", req.body);
+  Shifts.findOneAndUpdate({_id: req.body.shift_id}, { 
+    $push: {restricted: req.body.requester},
+    $pull: {requested: req.body.requester}
+  }, function(err, shift) {
     if (err) {
       console.error(err.message);
       res.status(404).send({error: err.message});
@@ -413,6 +431,16 @@ routes.get('/shiftsIPickedUp', isAuthenticated, function(req, res) {
       res.status(500).send({error:err.message});
     }
     res.send(shifts);
+  })
+})
+
+routes.get('/requestsByShift/:shiftId', isAuthenticated, function(req, res) {
+  console.log("======requestsByShift req-p: ", req.params);
+  Pickup.find({shift_id: req.params.shiftId}, function(err, items) {
+    if(err) {
+      res.status(500).send({error: err.message});
+    } 
+    res.send(items);
   })
 })
 
