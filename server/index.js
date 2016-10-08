@@ -72,22 +72,32 @@ routes.post('/pickup', isAuthenticated, function(req, res){
   req.body.restricted = req.body.shift_owner;
   // find all pickups 
 
-    var NewPickup = new Pickup(req.body);
-    NewPickup.save(function(err, post){
-      if(err){
-        console.error("Error in pickup shift")
-        res.status(500).send({error: err.message})
-      }
-      console.log('this is shift id :',req.body.shift_id, " and this is user id ", req.user._id)
-      Shifts.findOneAndUpdate({_id: req.body.shift_id}, { $push: {requested: req.user._id} }, function(err, shift) {
-        if (err) {
-          console.error(err.message);
-          res.status(404).send({error: err.message});
-          }
-        console.log('updated shift with id ',req.body.shift_id )
-        res.status(201).send(post);
+  Pickup.find({user_requested: req.user._id, shift_start: {$gte: new Date()}}, function(err, items) {
+    console.log("items: ", items);
+    if(err) {
+      res.status(500).send({error: err.message});
+    }
+    if(items.length >=5){
+      res.status(403).send("You have reached your active pickup limit.")
+    } else {
+      var NewPickup = new Pickup(req.body);
+      NewPickup.save(function(err, post){
+        if(err){
+          console.error("Error in pickup shift")
+          res.status(500).send({error: err.message})
+        }
+        console.log('this is shift id :',req.body.shift_id, " and this is user id ", req.user._id)
+        Shifts.findOneAndUpdate({_id: req.body.shift_id}, { $push: {requested: req.user._id} }, function(err, shift) {
+          if (err) {
+            console.error(err.message);
+            res.status(404).send({error: err.message});
+            }
+          console.log('updated shift with id ',req.body.shift_id )
+          res.status(201).send(post);
+        })
       })
-    })
+    }
+  })
 })
 
 // alternative endpoint for handling approvals, using helper function
