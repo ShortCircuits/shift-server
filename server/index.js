@@ -41,9 +41,8 @@ routes.post('/auth/facebook', authCtrl.facebookAuth, authCtrl.retrieveUser, auth
     res.json({ token: req.genertedToken });
 });
 
-routes.get('/protected', isAuthenticated, function(req,res){
-  res.send('Welcome');
-
+routes.post('/auth/google', authCtrl.googleAuth, authCtrl.retrieveUser, authCtrl.generateToken, function(req, res) {
+  res.json({ token: req.generatedToken });
 })
 //=========================
 //    /pickup Endpoints
