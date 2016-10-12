@@ -15,6 +15,7 @@ if (!process.env.FB_SECRET) {
 
 module.exports = {
    facebookAuthentication: facebookAuthentication,
+   googleAuthentication: googleAuthentication,
    createOrRetrieveUser: createOrRetrieveUser
 };
 
@@ -46,7 +47,6 @@ function facebookAuthentication(options, cb) {
            if (response.statusCode !== 200) return cb(accessToken.error.message);
 
            // Here we will normalize facebook response to our user schema
-           // So later we can use multiple providers
            var user = {
                profilePicture: 'https://graph.facebook.com/' + profile.id + '/picture?type=large',
                firstName: profile.first_name,
@@ -64,24 +64,69 @@ function facebookAuthentication(options, cb) {
 }
 
 /**
+* Google authentication using people api,
+* Here we will receive our code from the ionic app and pass it to the graph api
+* After auth code will be exchanged for accessToken we will fetch profile info
+* @param options
+* @param cb
+*/
+function googleAuthentication(options, cb) {
+  var accessTokenUrl = 'https://accounts.google.com/o/oauth2/token';
+  var peopleApiUrl = 'https://www.googleapis.com/plus/v1/people/me/openIdConnect';
+  var params = {
+    code: options.code,
+    client_id: options.clientId,
+    client_secret: GOOGLE_SECRET,
+    redirect_uri: options.redirectUri,
+    grant_type: 'authorization_code'
+  };
+
+  // Step 1. Exchange authorization code for access token.
+  request.post(accessTokenUrl, { json: true, form: params }, function(err, response, token) {
+    var accessToken = token.access_token;
+    var headers = { Authorization: 'Bearer ' + accessToken };
+
+    // Step 2. Retrieve profile information about the current user.
+    request.get({ url: peopleApiUrl, headers: headers, json: true }, function(err, response, profile) {
+      if (profile.error) {
+        return cb(profile.error.message);
+      }
+      // Here we will normalize google response to our user schema
+      var user = {
+         profilePicture: profile.picture.replace('sz=50', 'sz=200'),
+         firstName: profile.first_name,   //this field needs to be checked
+         lastName: profile.last_name,     //this field needs to be checked
+         profiles: {
+             google: profile.sub
+         },
+         email: profile.email,            //this field needs to be checked
+         token: accessToken
+       };
+
+       cb(null, { type: 'google', user: user });
+    });
+  });
+}
+
+/**
 * This method is responsible for fetching the user object,
 * if no user is found with specified credentials, new user will be created
 * @param options
 * @param cb
 */
 function createOrRetrieveUser(options, cb) {
-   // select the query object based on the auth type
-   var query = _defineProperty({}, 'profiles.' + options.type, options.user.profiles[options.type]);
-   // User in our database
-   User.findOne(query, function (err, user) {
-       if (err) return cb('Error fetching user');
+ // select the query object based on the auth type
+ var query = _defineProperty({}, 'profiles.' + options.type, options.user.profiles[options.type]);
+ // User in our database
+ User.findOne(query, function (err, user) {
+     if (err) return cb('Error fetching user');
 
-       // User found, return him to the callback
-       if (user) return cb(null, user);
+     // User found, return him to the callback
+     if (user) return cb(null, user);
 
-       // No user is found, create new user
-       createUser(options.user, cb);
-   });
+     // No user is found, create new user
+     createUser(options.user, cb);
+ });
 }
 
 /**
@@ -90,7 +135,7 @@ function createOrRetrieveUser(options, cb) {
 * @param cb
 */
 function createUser(user, cb) {
-   var newUser = new User(user);
+ var newUser = new User(user);
 
-   newUser.save(cb);
+ newUser.save(cb);
 }
