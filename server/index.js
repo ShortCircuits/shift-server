@@ -180,7 +180,7 @@ routes.get('/user/id/:id', isAuthenticated, function(req, res) {
       console.error(err.message);
       res.status(500).send({error: err.message});
     }
-    if (user.profilePicture){
+    if(user && user.profilePicture){
       var info = {
         profilePicture: user.profilePicture,
         firstName: user.firstName,
