@@ -70,8 +70,19 @@ routes.post('/pickup', isAuthenticated, function(req, res){
   req.body.approved = false;
   // insert shift owner into restricted field
   req.body.restricted = req.body.shift_owner;
-  // find all pickups 
 
+  // check to user negative reps and procede acordingly
+  Users.find({_id: req.user._id}, function(err, profileInfo){
+    if (err) {
+      console.error(err.message);
+      res.status(404).send({error: err.message});
+    }
+    if(profileInfo[0].rating.negative >= 2){
+      res.status(403).send("We apologize but due to negative reputation you have we can't allow you to pickup any shifts currently")
+    }
+  });
+
+  // find all pickups 
   Pickup.find({user_requested: req.user._id, shift_start: {$gte: new Date()}}, function(err, items) {
     if(err) {
       res.status(500).send({error: err.message});
