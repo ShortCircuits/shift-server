@@ -43,7 +43,7 @@ routes.post('/auth/facebook', authCtrl.facebookAuth, authCtrl.retrieveUser, auth
 
 routes.post('/auth/google', authCtrl.googleAuth, authCtrl.retrieveUser, authCtrl.generateToken, function(req, res) {
   res.json({ token: req.generatedToken });
-})
+});
 //=========================
 //    /pickup Endpoints
 //=========================

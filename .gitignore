@@ -8,3 +8,4 @@ server/api.js
 bower_components/
 server/ts.js
 server/fb.js
+server/google.js

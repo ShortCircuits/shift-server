@@ -9,8 +9,10 @@ var User = require('../model/users');
 
 if (!process.env.FB_SECRET) {
   var FB_SECRET = require('../fb').FB_SECRET;
+  var GOOGLE_SECRET = require('../google').GOOGLE_SECRET;
 } else {
   var FB_SECRET = process.env.FB_SECRET;
+  var GOOGLE_SECRET = process.env.GOOGLE_SECRET;
 }
 
 module.exports = {
