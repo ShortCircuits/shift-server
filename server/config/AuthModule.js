@@ -72,7 +72,7 @@ function facebookAuthentication(options, cb) {
 function createOrRetrieveUser(options, cb) {
    // select the query object based on the auth type
    var query = _defineProperty({}, 'profiles.' + options.type, options.user.profiles[options.type]);
-
+   // User in our database
    User.findOne(query, function (err, user) {
        if (err) return cb('Error fetching user');
 
