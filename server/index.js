@@ -206,7 +206,7 @@ routes.patch('/users', isAuthenticated, function(req, res){
   })
 })
 
-// Rate thy user :: TODO needs isAuthenticated
+// Rate thy user
 routes.patch('/rateuser', isAuthenticated, function(req, res){
   var reps;
 
@@ -226,11 +226,12 @@ routes.patch('/rateuser', isAuthenticated, function(req, res){
         var shiftTime = shift[0].shift_end;
         var currTime = new Date();
         if(currTime > shiftTime){
+
           // check to see if the person adding reps is the owner of the shift;
-          if(shifts[0].shift_owner === req.user._id){  
-            // console.log("this is shifts", shifts)
+          if(shifts[0].shift_owner === req.user._id){ 
             var requester = shifts[0].user_requested;
-            // if positive set var to pos and vice versa
+
+            // if positive set reps to positive or negative
             if(req.body.rep){
               if(req.body.rep === 'positive'){
                 reps = 'rating.positive';
@@ -241,7 +242,6 @@ routes.patch('/rateuser', isAuthenticated, function(req, res){
             var action = {};
             action[reps] = 1; 
             
-            // { $set: { "name" : "A.B. Abracus", "assignment" : 5}, $inc : { "points" : 5 } }
             // if user requested is part of the pickup shift then procede with updating his reps;
             Users.findOneAndUpdate({'_id': requester}, { $inc: action },function(err, items){
               if (err) {
@@ -322,7 +322,7 @@ routes.get('/areaSearch/address/:address', isAuthenticated, function(req, res) {
       }
     });
 });
-// https://maps.googleapis.com/maps/api/geocode/json?address=zipCode&key=AIzaSyBczNtYGmp_cAzRu0aIUzwJJSTStflsKcs
+
 
 //=========================
 //    /shift Endpoints
