@@ -9,7 +9,8 @@ var usersSchema = new mongoose.Schema({
   home_store: {storeId: String, address: String},
   rating: {positive: Number, negative: Number},
   profiles: {facebook: String},
-  token: Array
+  token: Array,
+  newUser: Boolean
 }, { timestamps: true });
 
 var Users = module.exports = mongoose.model('Users', usersSchema);
