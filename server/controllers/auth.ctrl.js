@@ -6,7 +6,8 @@ var TokenService = require('../config/TokenService');
 module.exports = {
    facebookAuth: facebookAuth,
    retrieveUser: retrieveUser,
-   generateToken: generateToken
+   generateToken: generateToken,
+   googleAuth: googleAuth
 };
 
 function facebookAuth(req, res, next) {
@@ -24,6 +25,22 @@ function facebookAuth(req, res, next) {
 
        next();
    });
+}
+
+function googleAuth(req, res, next) {
+  var options = {
+    code: req.body.code,
+    clientId: req.body.clientId,
+    redirectUri: req.body.redirectUri
+  };
+
+  AuthModule.googleAuthentication(options, function (err, response) {
+    if (err) return next({ err: err, status: 401 });
+
+    req.authObject = response;
+
+    next();
+  });
 }
 
 function retrieveUser(req, res, next) {
