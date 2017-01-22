@@ -41,6 +41,10 @@ routes.post('/auth/facebook', authCtrl.facebookAuth, authCtrl.retrieveUser, auth
     res.json({ token: req.genertedToken });
 });
 
+routes.post('/auth/google', authCtrl.googleAuth, authCtrl.retrieveUser, authCtrl.generateToken, function(req, res) {
+  res.json({ token: req.generatedToken });
+});
+
 routes.get('/protected', isAuthenticated, function(req,res){
   res.send('Welcome');
 
@@ -468,7 +472,7 @@ if(process.env.NODE_ENV !== 'test') {
   app.use('/', routes);
 
   // Start the server!
-  var port = process.env.PORT || 4000;
+  var port = process.env.PORT || 4001;
   app.listen(port);
   console.log("Listening on port", port);
 } else {

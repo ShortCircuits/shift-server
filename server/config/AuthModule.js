@@ -9,13 +9,16 @@ var User = require('../model/users');
 
 if (!process.env.FB_SECRET) {
   var FB_SECRET = require('../fb').FB_SECRET;
+  var GOOGLE_SECRET = require('../google').GOOGLE_SECRET; //?
 } else {
   var FB_SECRET = process.env.FB_SECRET;
+  var GOOGLE_SECRET = process.env.GOOGLE_SECRET;
 }
 
 module.exports = {
    facebookAuthentication: facebookAuthentication,
-   createOrRetrieveUser: createOrRetrieveUser
+   createOrRetrieveUser: createOrRetrieveUser,
+   googleAuthentication: googleAuthentication,
 };
 
 /**
@@ -61,6 +64,51 @@ function facebookAuthentication(options, cb) {
            cb(null, { type: 'facebook', user: user });
        });
    });
+}
+
+/**
+* Google authentication using people api,
+* Here we will receive our code from the ionic app and pass it to the graph api
+* After auth code will be exchanged for accessToken we will fetch profile info
+* @param options
+* @param cb
+*/
+function googleAuthentication(options, cb) {
+  var accessTokenUrl = 'https://accounts.google.com/o/oauth2/token';
+  var peopleApiUrl = 'https://www.googleapis.com/plus/v1/people/me/openIdConnect';
+  var params = {
+    code: options.code,
+    client_id: options.clientId,
+    client_secret: GOOGLE_SECRET,
+    redirect_uri: options.redirectUri,
+    grant_type: 'authorization_code'
+  };
+
+  // Step 1. Exchange authorization code for access token.
+  request.post(accessTokenUrl, { json: true, form: params }, function(err, response, token) {
+    var accessToken = token.access_token;
+    var headers = { Authorization: 'Bearer ' + accessToken };
+
+    // Step 2. Retrieve profile information about the current user.
+    request.get({ url: peopleApiUrl, headers: headers, json: true }, function(err, response, profile) {
+      if (profile.error) {
+        return cb(profile.error.message);
+      }
+      // Here we will normalize google response to our user schema
+      var user = {
+         profilePicture: profile.picture.replace('sz=50', 'sz=200'),
+         firstName: profile.first_name,   //this field needs to be checked
+         lastName: profile.last_name,     //this field needs to be checked
+         profiles: {
+             google: profile.sub
+         },
+         email: profile.email,            //this field needs to be checked
+         token: accessToken
+       };
+
+       cb(null, { type: 'google', user: user });
+    });
+  });
 }
 
 /**
